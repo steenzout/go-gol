@@ -26,10 +26,17 @@ type MockLogFormatter struct {
 	mock.Mock
 }
 
-func (m *MockLogFormatter) Format(msg gol.LogMessage) (string, error) {
+func (m *MockLogFormatter) Format(msg *gol.LogMessage) (out string, err error) {
 	args := m.Mock.Called(msg)
 
-	return args.Get(0).(string), args.Get(1).(error)
+	out = args.Get(0).(string)
+
+	if args.Get(1) == nil {
+		err = nil
+	} else {
+		err = args.Get(1).(error)
+	}
+	return
 }
 
 var _ gol.LogFormatter = (*MockLogFormatter)(nil)

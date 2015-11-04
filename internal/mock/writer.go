@@ -29,7 +29,14 @@ type MockWriter struct {
 func (m *MockWriter) Write(p []byte) (n int, err error) {
 	args := m.Mock.Called(p)
 
-	return args.Get(0).(int), args.Get(1).(error)
+	n = args.Get(0).(int)
+
+	if args.Get(1) == nil {
+		err = nil
+	} else {
+		err = args.Get(1).(error)
+	}
+	return
 }
 
 var _ io.Writer = (*MockWriter)(nil)

@@ -46,12 +46,12 @@ type LogMessage map[string]interface{}
 
 // LogFilter the interface a log filter needs to implement.
 type LogFilter interface {
-	Filter(LogMessage) (bool, error)
+	Filter(*LogMessage) (bool, error)
 }
 
 // LogFormatter the interface a log message formatter needs to implement.
 type LogFormatter interface {
-	Format(LogMessage) (string, error)
+	Format(*LogMessage) (string, error)
 }
 
 // Logger the interface a log message consumer must implement.
@@ -59,7 +59,7 @@ type Logger interface {
 	Filter() LogFilter
 	Formatter() LogFormatter
 	Writer() io.Writer
-	Send(LogMessage) error
+	Send(*LogMessage) error
 	SetFilter(LogFilter) error
 	SetFormatter(LogFormatter) error
 	SetWriter(io.Writer) error
@@ -84,21 +84,19 @@ func (l *BaseLogger) Writer() io.Writer {
 	return l.writer
 }
 
-func (l *BaseLogger) Send(m LogMessage) (err error)  {
-	var msg string
-
+func (l *BaseLogger) Send(m *LogMessage) (err error)  {
 	if m == nil {
 		return fmt.Errorf("")
 	}
 
-	if filter, err := l.filter.Filter(m); err != nil {
-		return err
-	} else if filter {
-		return nil
+	var filter bool
+	if filter, err = l.filter.Filter(m); err != nil || filter {
+		return
 	}
 
+	var msg string
 	if msg, err = l.formatter.Format(m); err != nil {
-		return nil
+		return
 	}
 
 	_, err = l.writer.Write([]byte(msg))

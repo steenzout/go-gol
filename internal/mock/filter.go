@@ -26,10 +26,17 @@ type MockLogFilter struct {
 	mock.Mock
 }
 
-func (m *MockLogFilter) Filter(msg gol.LogMessage) (bool, error) {
+func (m *MockLogFilter) Filter(msg *gol.LogMessage) (b bool, err error) {
 	args := m.Mock.Called(msg)
 
-	return args.Get(0).(bool), args.Get(1).(error)
+	b = args.Get(0).(bool)
+
+	if args.Get(1) == nil {
+		err = nil
+	} else {
+		err = args.Get(1).(error)
+	}
+	return
 }
 
 var _ gol.LogFilter = (*MockLogFilter)(nil)

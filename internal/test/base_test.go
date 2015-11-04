@@ -17,8 +17,6 @@
 package test
 
 import (
-	"io"
-
 	"github.com/mediaFORGE/gol"
 	"github.com/mediaFORGE/gol/internal/mock"
 
@@ -31,7 +29,9 @@ type BaseLoggerTestSuite struct {
 }
 
 type setupBaseLoggerTest struct {
-	setUp   func(mf gol.LogFilter, mfmt gol.LogFormatter, mw io.Writer) *gol.BaseLogger
+	setUp   func(
+		msg *gol.LogMessage, mf *mock.MockLogFilter, mfmt *mock.MockLogFormatter, mw *mock.MockWriter,
+	) *gol.BaseLogger
 	message gol.LogMessage
 	output  string
 }
@@ -68,31 +68,41 @@ func (s *BaseLoggerTestSuite) TestSend() {
 	in := map[string]setupBaseLoggerTest{
 		"error": setupBaseLoggerTest{
 			setUp: func(
-				msg gol.LogMessage, mf mock.MockLogFilter, mfmt mock.MockLogFormatter, mw mock.MockWriter,
+				msg *gol.LogMessage, mf *mock.MockLogFilter, mfmt *mock.MockLogFormatter, mw *mock.MockWriter,
 			) (logger *gol.BaseLogger) {
-				mf.Mock.On("Filter", msg).Return(true, nil)
-				mfmt.Mock.On("Format", msg).Return("ERROR", error)
+				mf.Mock.On("Filter", msg).Return(false, nil)
+				mfmt.Mock.On("Format", msg).Return("ERROR", nil)
+				mw.Mock.On("Write", []byte("ERROR")).Return(5, nil)
 
-				logger := &gol.BaseLogger{}
-				logger.SetFilter(mf.(gol.LogFilter))
-				logger.SetFormatter(mfmt.(gol.LogFormatter))
-				logger.SetWriter(mw.(io.Writer))
+				logger = &gol.BaseLogger{}
+				logger.SetFilter(mf)
+				logger.SetFormatter(mfmt)
+				logger.SetWriter(mw)
 
 				return
 			},
-			message: map[string]string{
+			message: map[string]interface{}{
 				"severity": gol.Error,
 			},
 			output: "ERROR",
 		},
 		"info": setupBaseLoggerTest{
-			setUp: func(msg gol.LogMessage, mf mock.MockLogFilter, mfmt mock.MockLogFormatter, mw mock.MockWriter) {
-				mf.Mock.On("Filter", msg).Return(false, nil)
+			setUp: func(
+				msg *gol.LogMessage, mf *mock.MockLogFilter, mfmt *mock.MockLogFormatter, mw *mock.MockWriter,
+			) (logger *gol.BaseLogger) {
+				mf.Mock.On("Filter", msg).Return(true, nil)
+
+				logger = &gol.BaseLogger{}
+				logger.SetFilter(mf)
+				logger.SetFormatter(mfmt)
+				logger.SetWriter(mw)
+
+				return
 			},
-			message: map[string]string{
+			message: map[string]interface{}{
 				"severity": gol.Info,
 			},
-			output: nil,
+			output: "",
 		},
 	}
 
@@ -100,9 +110,9 @@ func (s *BaseLoggerTestSuite) TestSend() {
 		mf := &mock.MockLogFilter{}
 		mfmt := &mock.MockLogFormatter{}
 		mw := &mock.MockWriter{}
-		logger := t.setUp(t.message, mf, mfmt, mw)
+		logger := t.setUp(&t.message, mf, mfmt, mw)
 
-		logger.Send(t.message)
+		logger.Send(&t.message)
 
 		mf.AssertExpectations(s.T())
 		mfmt.AssertExpectations(s.T())
