@@ -13,10 +13,8 @@ type LogMessage map[string]interface{}
 // GetSeverity returns the logger Severity level.
 func (msg LogMessage) Get(f string) (i interface{}, err error) {
 	if v, ok := msg[f]; ok {
-		fmt.Printf("%s=%s\n", f, v)
 		return v, nil
 	}
-	fmt.Println("error")
 	return nil, fmt.Errorf("Message does not contain field %s", f)
 }
 
@@ -37,40 +35,43 @@ func (msg LogMessage) SetSeverity(lvl severity.Type) (err error) {
 	return
 }
 
+// NewLogMessageFunc is the function signature of LogMessage constructor functions.
+type NewLogMessageFunc func(args... interface{}) *LogMessage
+
 // NewEmergency builds an emergency severity message.
 func NewEmergency(args ...interface{}) *LogMessage {
-	return NewMessage(severity.Type(severity.Emergency))
+	return NewMessage(severity.Type(severity.Emergency), args...)
 }
 // NewAlert builds an alert severity message.
 func NewAlert(args ...interface{}) *LogMessage {
-	return NewMessage(severity.Type(severity.Alert))
+	return NewMessage(severity.Type(severity.Alert), args...)
 }
 
 // NewCritical builds a critical severity message.
 func NewCritical(args ...interface{}) *LogMessage {
-	return NewMessage(severity.Type(severity.Critical))
+	return NewMessage(severity.Type(severity.Critical), args...)
 }
 // NewError builds an error severity message.
 func NewError(args ...interface{}) *LogMessage {
-	return NewMessage(severity.Type(severity.Error))
+	return NewMessage(severity.Type(severity.Error), args...)
 }
 
 // NewWarning builds a warning severity message.
 func NewWarning(args ...interface{}) *LogMessage {
-	return NewMessage(severity.Type(severity.Warning))
+	return NewMessage(severity.Type(severity.Warning), args...)
 }
 // NewNotice builds a notice severity message.
 func NewNotice(args ...interface{}) *LogMessage {
-	return NewMessage(severity.Type(severity.Notice))
+	return NewMessage(severity.Type(severity.Notice), args...)
 }
 
 // NewInfo builds an info severity message.
 func NewInfo(args ...interface{}) *LogMessage {
-	return NewMessage(severity.Type(severity.Info))
+	return NewMessage(severity.Type(severity.Info), args...)
 }
 // NewDebug builds a debug severity message.
 func NewDebug(args ...interface{}) *LogMessage {
-	return NewMessage(severity.Type(severity.Debug))
+	return NewMessage(severity.Type(severity.Debug), args...)
 }
 
 // NewMessage build a log message with the given severity level.
