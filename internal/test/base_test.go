@@ -18,6 +18,8 @@ package test
 
 import (
 	"github.com/mediaFORGE/gol"
+	"github.com/mediaFORGE/gol/fields"
+	"github.com/mediaFORGE/gol/fields/severity"
 	"github.com/mediaFORGE/gol/internal/mock"
 
 	"github.com/stretchr/testify/assert"
@@ -82,7 +84,7 @@ func (s *BaseLoggerTestSuite) TestSend() {
 				return
 			},
 			message: map[string]interface{}{
-				"severity": gol.Error,
+				fields.Severity: severity.Error,
 			},
 			output: "ERROR",
 		},
@@ -100,7 +102,7 @@ func (s *BaseLoggerTestSuite) TestSend() {
 				return
 			},
 			message: map[string]interface{}{
-				"severity": gol.Info,
+				fields.Severity: severity.Info,
 			},
 			output: "",
 		},

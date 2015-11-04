@@ -21,29 +21,6 @@ import (
 	"io"
 )
 
-// http://tools.ietf.org/html/rfc5424
-const (
-	// Emergency system is unusable
-	Emergency = iota
-	// Alert action must be taken immediately
-	Alert
-	// Critical critical conditions
-	Critical
-	// Error error conditions
-	Error
-	// Warning warning conditions
-	Warning
-	// Notice normal but significant condition
-	Notice
-	// Info informational messages
-	Info
-	// Debug debug-level messages
-	Debug
-)
-
-// LogMessage is a log message.
-type LogMessage map[string]interface{}
-
 // LogFilter the interface a log filter needs to implement.
 type LogFilter interface {
 	Filter(*LogMessage) (bool, error)
@@ -72,18 +49,31 @@ type BaseLogger struct {
 	writer io.Writer
 }
 
+// NewBaseLogger creates and initializes a BaseLogger struct.
+func NewBaseLogger(f LogFilter, fmt LogFormatter, w io.Writer) (l Logger) {
+	return &BaseLogger{
+		filter: f,
+		formatter: fmt,
+		writer: w,
+	}
+}
+
+// Filter returns the logger filter.
 func (l *BaseLogger) Filter() LogFilter {
 	return l.filter
 }
 
+// Formatter returns the logger formatter.
 func (l *BaseLogger) Formatter() LogFormatter {
 	return l.formatter
 }
 
+// Writer returns the logger writer.
 func (l *BaseLogger) Writer() io.Writer {
 	return l.writer
 }
 
+// Send process log message.
 func (l *BaseLogger) Send(m *LogMessage) (err error)  {
 	if m == nil {
 		return fmt.Errorf("")
@@ -103,6 +93,7 @@ func (l *BaseLogger) Send(m *LogMessage) (err error)  {
 	return
 }
 
+// SetFilter sets the logger filter.
 func (l *BaseLogger) SetFilter(f LogFilter) (err error) {
 	if f == nil {
 		return fmt.Errorf("")
@@ -112,6 +103,7 @@ func (l *BaseLogger) SetFilter(f LogFilter) (err error) {
 	return
 }
 
+// SetFormatter sets the logger formatter.
 func (l *BaseLogger) SetFormatter(f LogFormatter) (err error)  {
 	if f == nil {
 		return fmt.Errorf("")
@@ -121,6 +113,7 @@ func (l *BaseLogger) SetFormatter(f LogFormatter) (err error)  {
 	return
 }
 
+// SetWriter sets the logger writer.
 func (l *BaseLogger) SetWriter(w io.Writer) (err error)  {
 	if w == nil {
 		return fmt.Errorf("")
