@@ -16,6 +16,10 @@
 
 package severity
 
+import (
+	"fmt"
+)
+
 // http://tools.ietf.org/html/rfc5424
 const (
 	// Emergency severity level for system is unusable.
@@ -35,3 +39,39 @@ const (
 	// Debug severity level for debug-level messages.
 	Debug
 )
+
+// Type numerical value for the log message severity as specified by RFC5424.
+type Type int
+
+// String returns a string representation of the severity level.
+func (lvl Type) String() string {
+	switch lvl {
+	case Emergency:
+		return "EMERGENCY"
+	case Alert:
+		return "ALERT"
+	case Critical:
+		return "CRITICAL"
+	case Error:
+		return "ERROR"
+	case Warning:
+		return "WARNING"
+	case Notice:
+		return "NOTICE"
+	case Info:
+		return "INFO"
+	case Debug:
+		return "DEBUG"
+	default:
+		return "UNKNOWN"
+	}
+}
+// String returns a string representation of the severity level.
+func (lvl Type) Validate() error {
+	switch lvl {
+	case Emergency, Alert, Critical, Error, Warning, Notice, Info, Debug:
+		return nil
+	default:
+		return fmt.Errorf("Invalid severity level %d", lvl)
+	}
+}

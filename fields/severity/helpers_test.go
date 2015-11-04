@@ -16,25 +16,13 @@
 
 package severity
 
-func severityLevelString(l int) string {
-	switch l {
-		case Emergency:
-			return "EMERGENCY"
-		case Alert:
-			return "ALERT"
-		case Critical:
-			return "CRITICAL"
-		case Error:
-			return "ERROR"
-		case Warning:
-			return "WARNING"
-		case Notice:
-			return "NOTICE"
-		case Info:
-			return "INFO"
-		case Debug:
-			return "DEBUG"
-		default:
-			return "UNKNOWN"
-	}
+import (
+	"testing"
+
+	"github.com/stretchr/testify/suite"
+)
+
+// TestSuite runs the test suites.
+func TestSuite(t *testing.T) {
+	suite.Run(t, new(SeverityTestSuite))
 }
