@@ -1,3 +1,19 @@
+//
+// Copyright 2015 Rakuten Marketing LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
 package test
 
 import (
@@ -15,7 +31,7 @@ type BaseLoggerTestSuite struct {
 }
 
 type setupBaseLoggerTest struct {
-	setUp   func(mf gol.LogFilter, mfmt gol.LogFormatter, mw io.Writer)
+	setUp   func(mf gol.LogFilter, mfmt gol.LogFormatter, mw io.Writer) *gol.BaseLogger
 	message gol.LogMessage
 	output  string
 }
@@ -48,13 +64,21 @@ func (s *BaseLoggerTestSuite) TestGetSetWriter() {
 }
 
 func (s *BaseLoggerTestSuite) TestSend() {
-	var in map[string]setupBaseLoggerTest
 
-	in = map[string]setupBaseLoggerTest{
+	in := map[string]setupBaseLoggerTest{
 		"error": setupBaseLoggerTest{
-			setUp: func(msg gol.LogMessage, mf mock.MockLogFilter, mfmt mock.MockLogFormatter, mw mock.MockWriter) {
+			setUp: func(
+				msg gol.LogMessage, mf mock.MockLogFilter, mfmt mock.MockLogFormatter, mw mock.MockWriter,
+			) (logger *gol.BaseLogger) {
 				mf.Mock.On("Filter", msg).Return(true, nil)
-				mfmt.Mock("Format", msg).Return()
+				mfmt.Mock.On("Format", msg).Return("ERROR", error)
+
+				logger := &gol.BaseLogger{}
+				logger.SetFilter(mf.(gol.LogFilter))
+				logger.SetFormatter(mfmt.(gol.LogFormatter))
+				logger.SetWriter(mw.(io.Writer))
+
+				return
 			},
 			message: map[string]string{
 				"severity": gol.Error,
@@ -72,20 +96,16 @@ func (s *BaseLoggerTestSuite) TestSend() {
 		},
 	}
 
+	for _, t := range in {
+		mf := &mock.MockLogFilter{}
+		mfmt := &mock.MockLogFormatter{}
+		mw := &mock.MockWriter{}
+		logger := t.setUp(t.message, mf, mfmt, mw)
 
+		logger.Send(t.message)
 
-	// setUp
-	mf := &mock.MockLogFilter{}
-
-
-	mfmt := &mock.MockLogFormatter{}
-	mw := &mock.MockWriter{}
-
-	l := &gol.BaseLogger{}
-	l.SetFilter(mf)
-	l.SetFormatter(mfmt)
-	l.SetWriter(mw)
-
-
-
+		mf.AssertExpectations(s.T())
+		mfmt.AssertExpectations(s.T())
+		mw.AssertExpectations(s.T())
+	}
 }
