@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 
-package messages
+package severity
 
 func severityLevelString(l int) string {
 	switch l {

@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 
-package messages
+package severity
 
 // http://tools.ietf.org/html/rfc5424
 const (
