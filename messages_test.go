@@ -60,3 +60,27 @@ func (s *MessageTestSuite) TestGetSetSeverity() {
 	assert.Equal(s.T(), lvl, v)
 	assert.Nil(s.T(), err)
 }
+
+func (s *MessageTestSuite) assertSeverityLevel(expected severity.Type, f NewLogMessageFunc) {
+	msg := f()
+	severity, err := msg.GetSeverity()
+	assert.Nil(s.T(), err)
+	assert.Equal(s.T(), expected, severity)
+}
+
+func (s *MessageTestSuite) TestNewSeverity() {
+	cases := map[int]NewLogMessageFunc{
+		severity.Emergency: NewEmergency,
+		severity.Alert: NewAlert,
+		severity.Critical: NewCritical,
+		severity.Error: NewError,
+		severity.Warning: NewWarning,
+		severity.Notice: NewNotice,
+		severity.Info: NewInfo,
+		severity.Debug: NewDebug,
+	}
+
+	for lvl, f := range cases {
+		s.assertSeverityLevel(severity.Type(lvl), f)
+	}
+}
