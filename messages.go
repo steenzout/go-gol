@@ -10,7 +10,7 @@ import (
 // LogMessage is a log message.
 type LogMessage map[string]interface{}
 
-// GetSeverity returns the logger Severity level.
+// Get returns the logger Severity level.
 func (msg LogMessage) Get(f string) (i interface{}, err error) {
 	if v, ok := msg[f]; ok {
 		return v, nil
