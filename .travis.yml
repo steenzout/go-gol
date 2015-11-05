@@ -1,7 +1,10 @@
 language: go
 cache:
   directories:
-    - ${GOPATH}/src/github.com
+    - ${GOPATH}/src/github.com/golang
+    - ${GOPATH}/src/github.com/h12w
+    - ${GOPATH}/src/github.com/mattn
+    - ${GOPATH}/src/github.com/stretchr
     - ${GOPATH}/src/golang.org
 sudo: false
 go:
