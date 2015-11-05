@@ -18,8 +18,10 @@ package gol
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/mediaFORGE/gol/fields/severity"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
@@ -58,6 +60,40 @@ func (s *MessageTestSuite) TestGetSetSeverity() {
 
 	v, err = msg.GetSeverity()
 	assert.Equal(s.T(), lvl, v)
+	assert.Nil(s.T(), err)
+}
+
+func (s *MessageTestSuite) TestGetSetStart() {
+	msg := LogMessage{
+		"key": "value",
+	}
+
+	v, err := msg.GetStart()
+	assert.Equal(s.T(), time.Time{}, v)
+	assert.Equal(s.T(), fmt.Errorf("Message does not contain field start"), err)
+
+	start := time.Now()
+	msg.SetStart(start)
+
+	v, err = msg.GetStart()
+	assert.Equal(s.T(), start, v)
+	assert.Nil(s.T(), err)
+}
+
+func (s *MessageTestSuite) TestGetSetStop() {
+	msg := LogMessage{
+		"key": "value",
+	}
+
+	v, err := msg.GetStop()
+	assert.Equal(s.T(), time.Time{}, v)
+	assert.Equal(s.T(), fmt.Errorf("Message does not contain field stop"), err)
+
+	stop := time.Now()
+	msg.SetStop(stop)
+
+	v, err = msg.GetStop()
+	assert.Equal(s.T(), stop, v)
 	assert.Nil(s.T(), err)
 }
 
