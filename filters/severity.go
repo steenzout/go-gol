@@ -22,3 +22,5 @@ func (f Severity) Filter(msg *gol.LogMessage) bool {
 		return s <= f.minimum
 	}
 }
+
+var _ gol.LogFilter = (*Severity)(nil)
