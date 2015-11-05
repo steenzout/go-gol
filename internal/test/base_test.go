@@ -31,7 +31,7 @@ type BaseLoggerTestSuite struct {
 }
 
 type setupBaseLoggerTest struct {
-	setUp   func(
+	setUp func(
 		msg *gol.LogMessage, mf *mock.MockLogFilter, mfmt *mock.MockLogFormatter, mw *mock.MockWriter,
 	) *gol.BaseLogger
 	message gol.LogMessage

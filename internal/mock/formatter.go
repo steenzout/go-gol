@@ -40,4 +40,3 @@ func (m *MockLogFormatter) Format(msg *gol.LogMessage) (out string, err error) {
 }
 
 var _ gol.LogFormatter = (*MockLogFormatter)(nil)
-

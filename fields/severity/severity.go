@@ -66,6 +66,7 @@ func (lvl Type) String() string {
 		return "UNKNOWN"
 	}
 }
+
 // String returns a string representation of the severity level.
 func (lvl Type) Validate() error {
 	switch lvl {

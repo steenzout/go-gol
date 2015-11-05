@@ -14,22 +14,15 @@
 // limitations under the License.
 //
 
-package mock
+package filters
 
 import (
-	"github.com/mediaFORGE/gol"
+	"testing"
 
-	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/suite"
 )
 
-type MockLogFilter struct {
-	mock.Mock
+// TestSuite runs the test suites.
+func TestSuite(t *testing.T) {
+	suite.Run(t, new(SeverityTestSuite))
 }
-
-func (m *MockLogFilter) Filter(msg *gol.LogMessage) bool {
-	args := m.Mock.Called(msg)
-
-	return args.Get(0).(bool)
-}
-
-var _ gol.LogFilter = (*MockLogFilter)(nil)

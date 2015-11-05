@@ -14,22 +14,28 @@
 // limitations under the License.
 //
 
-package mock
+package filters
 
 import (
-	"github.com/mediaFORGE/gol"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 
-	"github.com/stretchr/testify/mock"
+	"github.com/mediaFORGE/gol"
+	"github.com/mediaFORGE/gol/fields/severity"
 )
 
-type MockLogFilter struct {
-	mock.Mock
+type SeverityTestSuite struct {
+	suite.Suite
 }
 
-func (m *MockLogFilter) Filter(msg *gol.LogMessage) bool {
-	args := m.Mock.Called(msg)
+func (s *SeverityTestSuite) TestFilter() {
+	f := NewSeverity(severity.Type(severity.Emergency))
+	cases := []gol.NewLogMessageFunc{
+		gol.NewAlert, gol.NewCritical, gol.NewError, gol.NewWarning, gol.NewNotice, gol.NewInfo, gol.NewDebug,
+	}
 
-	return args.Get(0).(bool)
+	assert.True(s.T(), f.Filter(gol.NewEmergency()))
+	for _, newFunc := range cases {
+		assert.False(s.T(), f.Filter(newFunc()))
+	}
 }
-
-var _ gol.LogFilter = (*MockLogFilter)(nil)

@@ -23,7 +23,7 @@ import (
 
 // LogFilter the interface a log filter needs to implement.
 type LogFilter interface {
-	Filter(*LogMessage) (bool, error)
+	Filter(*LogMessage) bool
 }
 
 // LogFormatter the interface a log message formatter needs to implement.
@@ -44,17 +44,17 @@ type Logger interface {
 
 // BaseLogger base implementation of a logger.
 type BaseLogger struct {
-	filter   LogFilter
-	formatter   LogFormatter
-	writer io.Writer
+	filter    LogFilter
+	formatter LogFormatter
+	writer    io.Writer
 }
 
 // NewBaseLogger creates and initializes a BaseLogger struct.
 func NewBaseLogger(f LogFilter, fmt LogFormatter, w io.Writer) (l Logger) {
 	return &BaseLogger{
-		filter: f,
+		filter:    f,
 		formatter: fmt,
-		writer: w,
+		writer:    w,
 	}
 }
 
@@ -74,13 +74,12 @@ func (l *BaseLogger) Writer() io.Writer {
 }
 
 // Send process log message.
-func (l *BaseLogger) Send(m *LogMessage) (err error)  {
+func (l *BaseLogger) Send(m *LogMessage) (err error) {
 	if m == nil {
 		return fmt.Errorf("")
 	}
 
-	var filter bool
-	if filter, err = l.filter.Filter(m); err != nil || filter {
+	if filter := l.filter.Filter(m); filter {
 		return
 	}
 
@@ -104,7 +103,7 @@ func (l *BaseLogger) SetFilter(f LogFilter) (err error) {
 }
 
 // SetFormatter sets the logger formatter.
-func (l *BaseLogger) SetFormatter(f LogFormatter) (err error)  {
+func (l *BaseLogger) SetFormatter(f LogFormatter) (err error) {
 	if f == nil {
 		return fmt.Errorf("")
 	}
@@ -114,7 +113,7 @@ func (l *BaseLogger) SetFormatter(f LogFormatter) (err error)  {
 }
 
 // SetWriter sets the logger writer.
-func (l *BaseLogger) SetWriter(w io.Writer) (err error)  {
+func (l *BaseLogger) SetWriter(w io.Writer) (err error) {
 	if w == nil {
 		return fmt.Errorf("")
 	}
