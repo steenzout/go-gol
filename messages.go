@@ -36,12 +36,13 @@ func (msg LogMessage) SetSeverity(lvl severity.Type) (err error) {
 }
 
 // NewLogMessageFunc is the function signature of LogMessage constructor functions.
-type NewLogMessageFunc func(args... interface{}) *LogMessage
+type NewLogMessageFunc func(args ...interface{}) *LogMessage
 
 // NewEmergency builds an emergency severity message.
 func NewEmergency(args ...interface{}) *LogMessage {
 	return NewMessage(severity.Type(severity.Emergency), args...)
 }
+
 // NewAlert builds an alert severity message.
 func NewAlert(args ...interface{}) *LogMessage {
 	return NewMessage(severity.Type(severity.Alert), args...)
@@ -51,6 +52,7 @@ func NewAlert(args ...interface{}) *LogMessage {
 func NewCritical(args ...interface{}) *LogMessage {
 	return NewMessage(severity.Type(severity.Critical), args...)
 }
+
 // NewError builds an error severity message.
 func NewError(args ...interface{}) *LogMessage {
 	return NewMessage(severity.Type(severity.Error), args...)
@@ -60,6 +62,7 @@ func NewError(args ...interface{}) *LogMessage {
 func NewWarning(args ...interface{}) *LogMessage {
 	return NewMessage(severity.Type(severity.Warning), args...)
 }
+
 // NewNotice builds a notice severity message.
 func NewNotice(args ...interface{}) *LogMessage {
 	return NewMessage(severity.Type(severity.Notice), args...)
@@ -69,6 +72,7 @@ func NewNotice(args ...interface{}) *LogMessage {
 func NewInfo(args ...interface{}) *LogMessage {
 	return NewMessage(severity.Type(severity.Info), args...)
 }
+
 // NewDebug builds a debug severity message.
 func NewDebug(args ...interface{}) *LogMessage {
 	return NewMessage(severity.Type(severity.Debug), args...)

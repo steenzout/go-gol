@@ -19,9 +19,9 @@ package gol
 import (
 	"fmt"
 
-	"github.com/stretchr/testify/suite"
-	"github.com/stretchr/testify/assert"
 	"github.com/mediaFORGE/gol/fields/severity"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
 type MessageTestSuite struct {
@@ -71,13 +71,13 @@ func (s *MessageTestSuite) assertSeverityLevel(expected severity.Type, f NewLogM
 func (s *MessageTestSuite) TestNewSeverity() {
 	cases := map[int]NewLogMessageFunc{
 		severity.Emergency: NewEmergency,
-		severity.Alert: NewAlert,
-		severity.Critical: NewCritical,
-		severity.Error: NewError,
-		severity.Warning: NewWarning,
-		severity.Notice: NewNotice,
-		severity.Info: NewInfo,
-		severity.Debug: NewDebug,
+		severity.Alert:     NewAlert,
+		severity.Critical:  NewCritical,
+		severity.Error:     NewError,
+		severity.Warning:   NewWarning,
+		severity.Notice:    NewNotice,
+		severity.Info:      NewInfo,
+		severity.Debug:     NewDebug,
 	}
 
 	for lvl, f := range cases {

@@ -21,4 +21,5 @@ script:
 
 after_success:
   - bash ${GOPATH}/src/github.com/h12w/gosweep/gosweep.sh
+  - cat profile.cov
   - ${HOME}/gopath/bin/goveralls -coverprofile=profile.cov -service=travis-ci
