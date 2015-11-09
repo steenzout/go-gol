@@ -34,7 +34,8 @@ func NewSeverity(s severity.Type) gol.LogFilter {
 func (f Severity) Filter(msg *gol.LogMessage) bool {
 
 	if s, err := msg.Severity(); err != nil {
-		return false
+		// no severity
+		return true
 	} else {
 		return s > f.minimum
 	}

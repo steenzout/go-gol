@@ -50,3 +50,8 @@ func (s *SeverityTestSuite) TestFilter() {
 	}
 	assert.False(s.T(), f.Filter(gol.NewDebug()))
 }
+
+func (s *SeverityTestSuite) TestFilterNoSeverityField() {
+	f := filters.NewSeverity(severity.Type(severity.Debug))
+	assert.True(s.T(), f.Filter(&gol.LogMessage{}))
+}
