@@ -74,20 +74,6 @@ func (s *LogTestSuite) TestGetSetWriter() {
 func (s *LogTestSuite) TestSend() {
 
 	in := map[string]setupLogTest{
-		"nil filter": setupLogTest{
-			setUp: func(
-				msg *gol.LogMessage, mf *mock.MockLogFilter, mfmt *mock.MockLogFormatter, mw *mock.MockWriter,
-			) (logger *gol.Log) {
-
-				logger = gol.SimpleLog(nil, nil, nil)
-
-				return
-			},
-			message: map[string]interface{}{
-				fields.Severity: severity.Error,
-			},
-			output: "",
-		},
 		"error": setupLogTest{
 			setUp: func(
 				msg *gol.LogMessage, mf *mock.MockLogFilter, mfmt *mock.MockLogFormatter, mw *mock.MockWriter,
@@ -96,10 +82,7 @@ func (s *LogTestSuite) TestSend() {
 				mfmt.Mock.On("Format", msg).Return("ERROR", nil)
 				mw.Mock.On("Write", []byte("ERROR")).Return(5, nil)
 
-				logger = gol.SimpleLog(nil, nil, nil)
-				logger.SetFilter(mf)
-				logger.SetFormatter(mfmt)
-				logger.SetWriter(mw)
+				logger = gol.SimpleLog(mf, mfmt, mw)
 
 				return
 			},
@@ -114,10 +97,7 @@ func (s *LogTestSuite) TestSend() {
 			) (logger *gol.Log) {
 				mf.Mock.On("Filter", msg).Return(true, nil)
 
-				logger = gol.SimpleLog(nil, nil, nil)
-				logger.SetFilter(mf)
-				logger.SetFormatter(mfmt)
-				logger.SetWriter(mw)
+				logger = gol.SimpleLog(mf, mfmt, mw)
 
 				return
 			},
