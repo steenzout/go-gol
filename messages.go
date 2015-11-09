@@ -39,31 +39,31 @@ func (msg LogMessage) SetSeverity(lvl severity.Type) (err error) {
 }
 
 // Start returns the value of the logger message start field.
-func (msg LogMessage) Start() (s time.Time, err error) {
+func (msg LogMessage) Start() (s *time.Time, err error) {
 	var v interface{}
 	if v, err = msg.Get(fields.Start); err == nil {
-		return v.(time.Time), nil
+		return v.(*time.Time), nil
 	}
-	return time.Time{}, err
+	return &time.Time{}, err
 }
 
 // SetStart sets the value of the logger message start field.
-func (msg LogMessage) SetStart(s time.Time) (err error) {
+func (msg LogMessage) SetStart(s *time.Time) (err error) {
 	msg[fields.Start] = s
 	return nil
 }
 
 // Stop returns the value of the logger message stop field.
-func (msg LogMessage) Stop() (s time.Time, err error) {
+func (msg LogMessage) Stop() (s *time.Time, err error) {
 	var v interface{}
 	if v, err = msg.Get(fields.Stop); err == nil {
-		return v.(time.Time), nil
+		return v.(*time.Time), nil
 	}
-	return time.Time{}, err
+	return &time.Time{}, err
 }
 
 // SetStop sets the value of the logger message stop field.
-func (msg LogMessage) SetStop(s time.Time) (err error) {
+func (msg LogMessage) SetStop(s *time.Time) (err error) {
 	msg[fields.Stop] = s
 	return nil
 }
@@ -74,7 +74,7 @@ func (msg LogMessage) JSON() (out string) {
 	if err != nil {
 		panic(err)
 	}
-	return string(byteArr)
+	return fmt.Sprintf("%s\n", string(byteArr))
 }
 
 // String returns a string representation of this struct.
@@ -84,6 +84,7 @@ func (msg LogMessage) String() (out string) {
 	for k, v := range msg {
 		buffer.WriteString(fmt.Sprintf("%s=%s", k, v))
 	}
+	buffer.WriteString("\n")
 	return buffer.String()
 }
 
