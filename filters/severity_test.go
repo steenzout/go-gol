@@ -35,9 +35,9 @@ func (s *SeverityTestSuite) TestFilter() {
 		gol.NewAlert, gol.NewCritical, gol.NewError, gol.NewWarning, gol.NewNotice, gol.NewInfo, gol.NewDebug,
 	}
 
-	assert.True(s.T(), f.Filter(gol.NewEmergency()))
+	assert.False(s.T(), f.Filter(gol.NewEmergency()))
 	for _, newFunc := range cases {
-		assert.False(s.T(), f.Filter(newFunc()))
+		assert.True(s.T(), f.Filter(newFunc()))
 	}
 
 	f = filters.NewSeverity(severity.Type(severity.Debug))
@@ -46,7 +46,7 @@ func (s *SeverityTestSuite) TestFilter() {
 	}
 
 	for _, newFunc := range cases {
-		assert.True(s.T(), f.Filter(newFunc()))
+		assert.False(s.T(), f.Filter(newFunc()))
 	}
-	assert.True(s.T(), f.Filter(gol.NewDebug()))
+	assert.False(s.T(), f.Filter(gol.NewDebug()))
 }

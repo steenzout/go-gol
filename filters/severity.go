@@ -36,7 +36,7 @@ func (f Severity) Filter(msg *gol.LogMessage) bool {
 	if s, err := msg.Severity(); err != nil {
 		return false
 	} else {
-		return s <= f.minimum
+		return s > f.minimum
 	}
 }
 
