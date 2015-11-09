@@ -17,6 +17,8 @@
 package gol_test
 
 import (
+	"fmt"
+
 	"github.com/mediaFORGE/gol"
 	"github.com/mediaFORGE/gol/internal/mock"
 
@@ -131,6 +133,18 @@ func (s *LogTestSuite) TestSendNilFormatter() {
 	mf.Mock.On("Filter", msg).Return(false, nil)
 
 	logger := gol.SimpleLog(mf, nil, nil)
+
+	assert.Error(s.T(), logger.Send(msg))
+}
+
+func (s *LogTestSuite) TestSendFormatError() {
+	msg := gol.NewDebug()
+	mf := &mock.MockLogFilter{}
+	mf.Mock.On("Filter", msg).Return(false, nil)
+	mfmt := &mock.MockLogFormatter{}
+	mfmt.Mock.On("Format", msg).Return("", fmt.Errorf("unknown"))
+
+	logger := gol.SimpleLog(mf, mfmt, nil)
 
 	assert.Error(s.T(), logger.Send(msg))
 }
