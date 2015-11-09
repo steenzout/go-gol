@@ -14,12 +14,13 @@
 // limitations under the License.
 //
 
-package gol
+package gol_test
 
 import (
 	"fmt"
 	"time"
 
+	"github.com/mediaFORGE/gol"
 	"github.com/mediaFORGE/gol/fields/severity"
 
 	"github.com/stretchr/testify/assert"
@@ -31,7 +32,7 @@ type MessageTestSuite struct {
 }
 
 func (s *MessageTestSuite) TestGet() {
-	msg := LogMessage{
+	msg := gol.LogMessage{
 		"key": "value",
 	}
 
@@ -47,7 +48,7 @@ func (s *MessageTestSuite) TestGet() {
 }
 
 func (s *MessageTestSuite) TestGetSetSeverity() {
-	msg := LogMessage{
+	msg := gol.LogMessage{
 		"key": "value",
 	}
 
@@ -64,7 +65,7 @@ func (s *MessageTestSuite) TestGetSetSeverity() {
 }
 
 func (s *MessageTestSuite) TestGetSetStart() {
-	msg := LogMessage{
+	msg := gol.LogMessage{
 		"key": "value",
 	}
 
@@ -81,7 +82,7 @@ func (s *MessageTestSuite) TestGetSetStart() {
 }
 
 func (s *MessageTestSuite) TestGetSetStop() {
-	msg := LogMessage{
+	msg := gol.LogMessage{
 		"key": "value",
 	}
 
@@ -97,7 +98,7 @@ func (s *MessageTestSuite) TestGetSetStop() {
 	assert.Nil(s.T(), err)
 }
 
-func (s *MessageTestSuite) assertSeverityLevel(expected severity.Type, f NewLogMessageFunc) {
+func (s *MessageTestSuite) assertSeverityLevel(expected severity.Type, f gol.NewLogMessageFunc) {
 	msg := f()
 	severity, err := msg.GetSeverity()
 	assert.Nil(s.T(), err)
@@ -105,15 +106,15 @@ func (s *MessageTestSuite) assertSeverityLevel(expected severity.Type, f NewLogM
 }
 
 func (s *MessageTestSuite) TestNewSeverity() {
-	cases := map[int]NewLogMessageFunc{
-		severity.Emergency: NewEmergency,
-		severity.Alert:     NewAlert,
-		severity.Critical:  NewCritical,
-		severity.Error:     NewError,
-		severity.Warning:   NewWarning,
-		severity.Notice:    NewNotice,
-		severity.Info:      NewInfo,
-		severity.Debug:     NewDebug,
+	cases := map[int]gol.NewLogMessageFunc{
+		severity.Emergency: gol.NewEmergency,
+		severity.Alert:     gol.NewAlert,
+		severity.Critical:  gol.NewCritical,
+		severity.Error:     gol.NewError,
+		severity.Warning:   gol.NewWarning,
+		severity.Notice:    gol.NewNotice,
+		severity.Info:      gol.NewInfo,
+		severity.Debug:     gol.NewDebug,
 	}
 
 	for lvl, f := range cases {
