@@ -35,6 +35,8 @@ func (f *ErrorFilter) Filter(msg *gol.LogMessage) bool {
 	}
 }
 
+var _ gol.LogFilter = (*ErrorFilter)(nil)
+
 type InfoFilter struct{}
 
 func (f *InfoFilter) Filter(msg *gol.LogMessage) bool {
@@ -46,12 +48,10 @@ func (f *InfoFilter) Filter(msg *gol.LogMessage) bool {
 	}
 }
 
-var _ gol.LogFilter = (*ErrorFilter)(nil)
-
-var jsonFmt = &formatters.JSON{}
-var log gol.Logger = gol.SimpleLog(&InfoFilter{}, jsonFmt, os.Stdout)
+var _ gol.LogFilter = (*InfoFilter)(nil)
 
 var txtFmt = &formatters.Text{}
+var log gol.Logger = gol.SimpleLog(&InfoFilter{}, txtFmt, os.Stdout)
 var errorLog gol.Logger = gol.SimpleLog(&ErrorFilter{}, txtFmt, os.Stderr)
 
 func main() {
