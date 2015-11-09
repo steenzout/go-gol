@@ -88,6 +88,10 @@ func (l *Log) Send(m *LogMessage) (err error) {
 		return
 	}
 
+	if l.writer == nil {
+		return fmt.Errorf("log writer is nil")
+	}
+
 	_, err = l.writer.Write([]byte(msg))
 	return
 }

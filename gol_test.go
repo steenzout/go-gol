@@ -18,8 +18,6 @@ package gol_test
 
 import (
 	"github.com/mediaFORGE/gol"
-	"github.com/mediaFORGE/gol/fields"
-	"github.com/mediaFORGE/gol/fields/severity"
 	"github.com/mediaFORGE/gol/internal/mock"
 
 	"github.com/stretchr/testify/assert"
@@ -34,7 +32,7 @@ type setupLogTest struct {
 	setUp func(
 		msg *gol.LogMessage, mf *mock.MockLogFilter, mfmt *mock.MockLogFormatter, mw *mock.MockWriter,
 	) *gol.Log
-	message gol.LogMessage
+	message *gol.LogMessage
 	output  string
 }
 
@@ -86,10 +84,8 @@ func (s *LogTestSuite) TestSend() {
 
 				return
 			},
-			message: map[string]interface{}{
-				fields.Severity: severity.Error,
-			},
-			output: "ERROR",
+			message: gol.NewError(),
+			output:  "ERROR",
 		},
 		"info": setupLogTest{
 			setUp: func(
@@ -101,10 +97,8 @@ func (s *LogTestSuite) TestSend() {
 
 				return
 			},
-			message: map[string]interface{}{
-				fields.Severity: severity.Info,
-			},
-			output: "",
+			message: gol.NewInfo(),
+			output:  "",
 		},
 	}
 
@@ -112,12 +106,43 @@ func (s *LogTestSuite) TestSend() {
 		mf := &mock.MockLogFilter{}
 		mfmt := &mock.MockLogFormatter{}
 		mw := &mock.MockWriter{}
-		logger := t.setUp(&t.message, mf, mfmt, mw)
+		logger := t.setUp(t.message, mf, mfmt, mw)
 
-		logger.Send(&t.message)
+		logger.Send(t.message)
 
 		mf.AssertExpectations(s.T())
 		mfmt.AssertExpectations(s.T())
 		mw.AssertExpectations(s.T())
 	}
+}
+
+func (s *LogTestSuite) TestSendNilMessage() {
+	mf := &mock.MockLogFilter{}
+	mfmt := &mock.MockLogFormatter{}
+	mw := &mock.MockWriter{}
+	logger := gol.SimpleLog(mf, mfmt, mw)
+
+	assert.Nil(s.T(), logger.Send(nil))
+}
+
+func (s *LogTestSuite) TestSendNilFormatter() {
+	msg := gol.NewDebug()
+	mf := &mock.MockLogFilter{}
+	mf.Mock.On("Filter", msg).Return(false, nil)
+
+	logger := gol.SimpleLog(mf, nil, nil)
+
+	assert.Error(s.T(), logger.Send(msg))
+}
+
+func (s *LogTestSuite) TestSendNilWriter() {
+	msg := gol.NewDebug()
+	mf := &mock.MockLogFilter{}
+	mf.Mock.On("Filter", msg).Return(false, nil)
+	mfmt := &mock.MockLogFormatter{}
+	mfmt.Mock.On("Format", msg).Return("ERROR", nil)
+
+	logger := gol.SimpleLog(mf, mfmt, nil)
+
+	assert.Error(s.T(), logger.Send(msg))
 }
