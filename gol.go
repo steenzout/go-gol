@@ -75,7 +75,7 @@ func (l *Log) Send(m *LogMessage) (err error) {
 		return
 	}
 
-	if l.filter == nil || l.filter.Filter(m) {
+	if l.filter != nil && l.filter.Filter(m) {
 		return
 	}
 
