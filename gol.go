@@ -79,13 +79,13 @@ func (l *Log) Send(m *LogMessage) (err error) {
 		return
 	}
 
+	if l.formatter == nil {
+		return fmt.Errorf("log formatter is nil")
+	}
+
 	var msg string
-	if l.formatter != nil {
-		if msg, err = l.formatter.Format(m); err != nil {
-			return
-		}
-	} else {
-		msg = m.String()
+	if msg, err = l.formatter.Format(m); err != nil {
+		return
 	}
 
 	_, err = l.writer.Write([]byte(msg))
@@ -100,6 +100,9 @@ func (l *Log) SetFilter(f LogFilter) error {
 
 // SetFormatter sets the logger formatter.
 func (l *Log) SetFormatter(f LogFormatter) error {
+	if f == nil {
+		return fmt.Errorf("Nil formatter")
+	}
 	l.formatter = f
 	return nil
 }

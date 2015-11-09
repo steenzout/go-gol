@@ -57,7 +57,7 @@ func (s *LogTestSuite) TestGetSetFormatter() {
 	assert.Nil(s.T(), l.SetFormatter(&mock.MockLogFormatter{}))
 	assert.NotNil(s.T(), l.Formatter())
 
-	assert.Nil(s.T(), l.SetFormatter(nil))
+	assert.Error(s.T(), l.SetFormatter(nil))
 }
 
 func (s *LogTestSuite) TestGetSetWriter() {
