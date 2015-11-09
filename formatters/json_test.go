@@ -36,6 +36,9 @@ func (s *JSONTestSuite) TestFormat() {
 	fmt := &formatters.JSON{}
 
 	o, err := fmt.Format(msg)
-	assert.Equal(s.T(), "{\"key1\":\"value1\", \"key2\":\"value2\"}\n", o)
+	assert.True(
+		s.T(),
+		"{\"key1\":\"value1\",\"key2\":\"value2\"}\n" == o,
+		"{\"key2\":\"value2\",\"key1\":\"value1\"}\n" == o)
 	assert.Nil(s.T(), err)
 }
