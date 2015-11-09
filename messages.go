@@ -19,8 +19,8 @@ func (msg LogMessage) Get(f string) (i interface{}, err error) {
 	return nil, fmt.Errorf("Message does not contain field %s", f)
 }
 
-// GetSeverity returns the value of the logger message severity level field.
-func (msg LogMessage) GetSeverity() (lvl severity.Type, err error) {
+// Severity returns the value of the logger message severity level field.
+func (msg LogMessage) Severity() (lvl severity.Type, err error) {
 	var v interface{}
 	if v, err = msg.Get(fields.Severity); err == nil {
 		return v.(severity.Type), nil
@@ -36,8 +36,8 @@ func (msg LogMessage) SetSeverity(lvl severity.Type) (err error) {
 	return
 }
 
-// GetStart returns the value of the logger message start field.
-func (msg LogMessage) GetStart() (s time.Time, err error) {
+// Start returns the value of the logger message start field.
+func (msg LogMessage) Start() (s time.Time, err error) {
 	var v interface{}
 	if v, err = msg.Get(fields.Start); err == nil {
 		return v.(time.Time), nil
@@ -51,8 +51,8 @@ func (msg LogMessage) SetStart(s time.Time) (err error) {
 	return nil
 }
 
-// GetStop returns the value of the logger message stop field.
-func (msg LogMessage) GetStop() (s time.Time, err error) {
+// Stop returns the value of the logger message stop field.
+func (msg LogMessage) Stop() (s time.Time, err error) {
 	var v interface{}
 	if v, err = msg.Get(fields.Stop); err == nil {
 		return v.(time.Time), nil
