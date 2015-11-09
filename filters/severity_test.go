@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 
-package filters
+package filters_test
 
 import (
 	"github.com/stretchr/testify/assert"
@@ -22,6 +22,7 @@ import (
 
 	"github.com/mediaFORGE/gol"
 	"github.com/mediaFORGE/gol/fields/severity"
+	"github.com/mediaFORGE/gol/filters"
 )
 
 type SeverityTestSuite struct {
@@ -29,7 +30,7 @@ type SeverityTestSuite struct {
 }
 
 func (s *SeverityTestSuite) TestFilter() {
-	f := NewSeverity(severity.Type(severity.Emergency))
+	f := filters.NewSeverity(severity.Type(severity.Emergency))
 	cases := []gol.NewLogMessageFunc{
 		gol.NewAlert, gol.NewCritical, gol.NewError, gol.NewWarning, gol.NewNotice, gol.NewInfo, gol.NewDebug,
 	}
