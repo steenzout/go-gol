@@ -39,4 +39,14 @@ func (s *SeverityTestSuite) TestFilter() {
 	for _, newFunc := range cases {
 		assert.False(s.T(), f.Filter(newFunc()))
 	}
+
+	f = filters.NewSeverity(severity.Type(severity.Debug))
+	cases = []gol.NewLogMessageFunc{
+		gol.NewEmergency, gol.NewAlert, gol.NewCritical, gol.NewError, gol.NewWarning, gol.NewNotice, gol.NewInfo,
+	}
+
+	for _, newFunc := range cases {
+		assert.True(s.T(), f.Filter(newFunc()))
+	}
+	assert.True(s.T(), f.Filter(gol.NewDebug()))
 }
