@@ -22,10 +22,14 @@ import (
 	"github.com/mediaFORGE/gol"
 	"github.com/mediaFORGE/gol/fields/severity"
 	"github.com/mediaFORGE/gol/filters"
+	"github.com/mediaFORGE/gol/formatters"
 )
 
-var log gol.Logger = gol.SimpleLog(nil, nil, os.Stdout)
-var errorLog gol.Logger = gol.SimpleLog(filters.NewSeverity(severity.Error), nil, os.Stderr)
+var jsonFmt = &formatters.JSON{}
+var log gol.Logger = gol.SimpleLog(nil, jsonFmt, os.Stdout)
+
+var txtFmt = &formatters.Text{}
+var errorLog gol.Logger = gol.SimpleLog(filters.NewSeverity(severity.Error), txtFmt, os.Stderr)
 
 func main() {
 	log.Send(&gol.LogMessage{"hello": "world!"})
