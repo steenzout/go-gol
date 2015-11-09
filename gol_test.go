@@ -26,57 +26,77 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type BaseLoggerTestSuite struct {
+type LogTestSuite struct {
 	suite.Suite
 }
 
-type setupBaseLoggerTest struct {
+type setupLogTest struct {
 	setUp func(
 		msg *gol.LogMessage, mf *mock.MockLogFilter, mfmt *mock.MockLogFormatter, mw *mock.MockWriter,
-	) *gol.BaseLogger
+	) *gol.Log
 	message gol.LogMessage
 	output  string
 }
 
-func (s *BaseLoggerTestSuite) TestGetSetFilter() {
+func (s *LogTestSuite) TestGetSetFilter() {
 
-	l := gol.BaseLogger{}
+	l := gol.SimpleLog(nil, nil, nil)
 
 	assert.Nil(s.T(), l.Filter())
-	l.SetFilter(&mock.MockLogFilter{})
+	assert.Nil(s.T(), l.SetFilter(&mock.MockLogFilter{}))
 	assert.NotNil(s.T(), l.Filter())
+
+	assert.Nil(s.T(), l.SetFilter(nil))
 }
 
-func (s *BaseLoggerTestSuite) TestGetSetFormatter() {
+func (s *LogTestSuite) TestGetSetFormatter() {
 
-	l := gol.BaseLogger{}
+	l := gol.SimpleLog(nil, nil, nil)
 
 	assert.Nil(s.T(), l.Formatter())
-	l.SetFormatter(&mock.MockLogFormatter{})
+	assert.Nil(s.T(), l.SetFormatter(&mock.MockLogFormatter{}))
 	assert.NotNil(s.T(), l.Formatter())
+
+	assert.Nil(s.T(), l.SetFormatter(nil))
 }
 
-func (s *BaseLoggerTestSuite) TestGetSetWriter() {
+func (s *LogTestSuite) TestGetSetWriter() {
 
-	l := gol.BaseLogger{}
+	l := gol.SimpleLog(nil, nil, nil)
 
 	assert.Nil(s.T(), l.Writer())
-	l.SetWriter(&mock.MockWriter{})
+	assert.Nil(s.T(), l.SetWriter(&mock.MockWriter{}))
 	assert.NotNil(s.T(), l.Writer())
+
+	assert.Error(s.T(), l.SetWriter(nil))
 }
 
-func (s *BaseLoggerTestSuite) TestSend() {
+func (s *LogTestSuite) TestSend() {
 
-	in := map[string]setupBaseLoggerTest{
-		"error": setupBaseLoggerTest{
+	in := map[string]setupLogTest{
+		"nil filter": setupLogTest{
 			setUp: func(
 				msg *gol.LogMessage, mf *mock.MockLogFilter, mfmt *mock.MockLogFormatter, mw *mock.MockWriter,
-			) (logger *gol.BaseLogger) {
+			) (logger *gol.Log) {
+
+				logger = gol.SimpleLog(nil, nil, nil)
+
+				return
+			},
+			message: map[string]interface{}{
+				fields.Severity: severity.Error,
+			},
+			output: "",
+		},
+		"error": setupLogTest{
+			setUp: func(
+				msg *gol.LogMessage, mf *mock.MockLogFilter, mfmt *mock.MockLogFormatter, mw *mock.MockWriter,
+			) (logger *gol.Log) {
 				mf.Mock.On("Filter", msg).Return(false, nil)
 				mfmt.Mock.On("Format", msg).Return("ERROR", nil)
 				mw.Mock.On("Write", []byte("ERROR")).Return(5, nil)
 
-				logger = &gol.BaseLogger{}
+				logger = gol.SimpleLog(nil, nil, nil)
 				logger.SetFilter(mf)
 				logger.SetFormatter(mfmt)
 				logger.SetWriter(mw)
@@ -88,13 +108,13 @@ func (s *BaseLoggerTestSuite) TestSend() {
 			},
 			output: "ERROR",
 		},
-		"info": setupBaseLoggerTest{
+		"info": setupLogTest{
 			setUp: func(
 				msg *gol.LogMessage, mf *mock.MockLogFilter, mfmt *mock.MockLogFormatter, mw *mock.MockWriter,
-			) (logger *gol.BaseLogger) {
+			) (logger *gol.Log) {
 				mf.Mock.On("Filter", msg).Return(true, nil)
 
-				logger = &gol.BaseLogger{}
+				logger = gol.SimpleLog(nil, nil, nil)
 				logger.SetFilter(mf)
 				logger.SetFormatter(mfmt)
 				logger.SetWriter(mw)

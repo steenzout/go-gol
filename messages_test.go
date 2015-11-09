@@ -105,6 +105,13 @@ func (s *MessageTestSuite) assertSeverityLevel(expected severity.Type, f gol.New
 	assert.Equal(s.T(), expected, severity)
 }
 
+func (s *MessageTestSuite) TestJSON() {
+	msg := gol.LogMessage{
+		"key": "value",
+	}
+	assert.Equal(s.T(), "{\"key\":\"value\"}", msg.JSON())
+}
+
 func (s *MessageTestSuite) TestNewSeverity() {
 	cases := map[int]gol.NewLogMessageFunc{
 		severity.Emergency: gol.NewEmergency,
@@ -120,4 +127,11 @@ func (s *MessageTestSuite) TestNewSeverity() {
 	for lvl, f := range cases {
 		s.assertSeverityLevel(severity.Type(lvl), f)
 	}
+}
+
+func (s *MessageTestSuite) TestString() {
+	msg := gol.LogMessage{
+		"key": "value",
+	}
+	assert.Equal(s.T(), "key=value", msg.String())
 }

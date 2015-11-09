@@ -42,50 +42,50 @@ type Logger interface {
 	SetWriter(io.Writer) error
 }
 
-// BaseLogger base implementation of a logger.
-type BaseLogger struct {
+// Log base struct of a logger.
+type Log struct {
 	filter    LogFilter
 	formatter LogFormatter
 	writer    io.Writer
 }
 
-// NewBaseLogger creates and initializes a BaseLogger struct.
-func NewBaseLogger(f LogFilter, fmt LogFormatter, w io.Writer) (l Logger) {
-	return &BaseLogger{
-		filter:    f,
-		formatter: fmt,
-		writer:    w,
-	}
+// SimpleLog creates and initializes a logger struct.
+func SimpleLog(f LogFilter, fmt LogFormatter, w io.Writer) *Log {
+	return &Log{f, fmt, w}
 }
 
 // Filter returns the logger filter.
-func (l *BaseLogger) Filter() LogFilter {
+func (l *Log) Filter() LogFilter {
 	return l.filter
 }
 
 // Formatter returns the logger formatter.
-func (l *BaseLogger) Formatter() LogFormatter {
+func (l *Log) Formatter() LogFormatter {
 	return l.formatter
 }
 
 // Writer returns the logger writer.
-func (l *BaseLogger) Writer() io.Writer {
+func (l *Log) Writer() io.Writer {
 	return l.writer
 }
 
 // Send process log message.
-func (l *BaseLogger) Send(m *LogMessage) (err error) {
+func (l *Log) Send(m *LogMessage) (err error) {
 	if m == nil {
-		return fmt.Errorf("")
+		return
 	}
 
-	if filter := l.filter.Filter(m); filter {
+	if l.filter == nil || l.filter.Filter(m) {
 		return
 	}
 
 	var msg string
-	if msg, err = l.formatter.Format(m); err != nil {
-		return
+	if l.formatter != nil {
+		if msg, err = l.formatter.Format(m); err != nil {
+			return
+		}
+	} else {
+		msg = m.String()
 	}
 
 	_, err = l.writer.Write([]byte(msg))
@@ -93,33 +93,24 @@ func (l *BaseLogger) Send(m *LogMessage) (err error) {
 }
 
 // SetFilter sets the logger filter.
-func (l *BaseLogger) SetFilter(f LogFilter) (err error) {
-	if f == nil {
-		return fmt.Errorf("")
-	}
-
+func (l *Log) SetFilter(f LogFilter) error {
 	l.filter = f
-	return
+	return nil
 }
 
 // SetFormatter sets the logger formatter.
-func (l *BaseLogger) SetFormatter(f LogFormatter) (err error) {
-	if f == nil {
-		return fmt.Errorf("")
-	}
-
+func (l *Log) SetFormatter(f LogFormatter) error {
 	l.formatter = f
-	return
+	return nil
 }
 
 // SetWriter sets the logger writer.
-func (l *BaseLogger) SetWriter(w io.Writer) (err error) {
+func (l *Log) SetWriter(w io.Writer) error {
 	if w == nil {
-		return fmt.Errorf("")
+		return fmt.Errorf("Nil writer")
 	}
-
 	l.writer = w
-	return
+	return nil
 }
 
-var _ Logger = (*BaseLogger)(nil)
+var _ Logger = (*Log)(nil)

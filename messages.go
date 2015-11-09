@@ -1,6 +1,8 @@
 package gol
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -64,6 +66,25 @@ func (msg LogMessage) Stop() (s time.Time, err error) {
 func (msg LogMessage) SetStop(s time.Time) (err error) {
 	msg[fields.Stop] = s
 	return nil
+}
+
+// JSON returns a JSON representation of this struct.
+func (msg LogMessage) JSON() (out string) {
+	byteArr, err := json.Marshal(msg)
+	if err != nil {
+		panic(err)
+	}
+	return string(byteArr)
+}
+
+// String returns a string representation of this struct.
+func (msg LogMessage) String() (out string) {
+	var buffer bytes.Buffer
+
+	for k, v := range msg {
+		buffer.WriteString(fmt.Sprintf("%s=%s", k, v))
+	}
+	return buffer.String()
 }
 
 // NewLogMessageFunc is the function signature of LogMessage constructor functions.
