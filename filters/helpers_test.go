@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 
-package filters
+package filters_test
 
 import (
 	"testing"

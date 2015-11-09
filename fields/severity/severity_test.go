@@ -14,9 +14,10 @@
 // limitations under the License.
 //
 
-package severity
+package severity_test
 
 import (
+	"github.com/mediaFORGE/gol/fields/severity"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
@@ -26,26 +27,26 @@ type SeverityTestSuite struct {
 }
 
 func (s *SeverityTestSuite) TestTypeString() {
-	assert.Equal(s.T(), "UNKNOWN", Type(-1).String())
+	assert.Equal(s.T(), "UNKNOWN", severity.Type(-1).String())
 
-	assert.Equal(s.T(), "EMERGENCY", Type(Emergency).String())
-	assert.Equal(s.T(), "ALERT", Type(Alert).String())
-	assert.Equal(s.T(), "CRITICAL", Type(Critical).String())
-	assert.Equal(s.T(), "ERROR", Type(Error).String())
-	assert.Equal(s.T(), "WARNING", Type(Warning).String())
-	assert.Equal(s.T(), "NOTICE", Type(Notice).String())
-	assert.Equal(s.T(), "INFO", Type(Info).String())
-	assert.Equal(s.T(), "DEBUG", Type(Debug).String())
+	assert.Equal(s.T(), "EMERGENCY", severity.Type(severity.Emergency).String())
+	assert.Equal(s.T(), "ALERT", severity.Type(severity.Alert).String())
+	assert.Equal(s.T(), "CRITICAL", severity.Type(severity.Critical).String())
+	assert.Equal(s.T(), "ERROR", severity.Type(severity.Error).String())
+	assert.Equal(s.T(), "WARNING", severity.Type(severity.Warning).String())
+	assert.Equal(s.T(), "NOTICE", severity.Type(severity.Notice).String())
+	assert.Equal(s.T(), "INFO", severity.Type(severity.Info).String())
+	assert.Equal(s.T(), "DEBUG", severity.Type(severity.Debug).String())
 
-	assert.Equal(s.T(), "UNKNOWN", Type(8).String())
+	assert.Equal(s.T(), "UNKNOWN", severity.Type(8).String())
 }
 
 func (s *SeverityTestSuite) TestTypeValidate() {
-	assert.NotNil(s.T(), Type(-1).Validate())
+	assert.NotNil(s.T(), severity.Type(-1).Validate())
 
 	for i := 0; i < 8; i++ {
-		assert.Nil(s.T(), Type(i).Validate())
+		assert.Nil(s.T(), severity.Type(i).Validate())
 	}
 
-	assert.NotNil(s.T(), Type(8).Validate())
+	assert.NotNil(s.T(), severity.Type(8).Validate())
 }

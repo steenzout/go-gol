@@ -14,12 +14,15 @@
 // limitations under the License.
 //
 
-package gol
+package gol_test
 
 import (
 	"fmt"
+	"time"
 
+	"github.com/mediaFORGE/gol"
 	"github.com/mediaFORGE/gol/fields/severity"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
@@ -29,7 +32,7 @@ type MessageTestSuite struct {
 }
 
 func (s *MessageTestSuite) TestGet() {
-	msg := LogMessage{
+	msg := gol.LogMessage{
 		"key": "value",
 	}
 
@@ -45,7 +48,7 @@ func (s *MessageTestSuite) TestGet() {
 }
 
 func (s *MessageTestSuite) TestGetSetSeverity() {
-	msg := LogMessage{
+	msg := gol.LogMessage{
 		"key": "value",
 	}
 
@@ -61,7 +64,41 @@ func (s *MessageTestSuite) TestGetSetSeverity() {
 	assert.Nil(s.T(), err)
 }
 
-func (s *MessageTestSuite) assertSeverityLevel(expected severity.Type, f NewLogMessageFunc) {
+func (s *MessageTestSuite) TestGetSetStart() {
+	msg := gol.LogMessage{
+		"key": "value",
+	}
+
+	v, err := msg.GetStart()
+	assert.Equal(s.T(), time.Time{}, v)
+	assert.Equal(s.T(), fmt.Errorf("Message does not contain field start"), err)
+
+	start := time.Now()
+	msg.SetStart(start)
+
+	v, err = msg.GetStart()
+	assert.Equal(s.T(), start, v)
+	assert.Nil(s.T(), err)
+}
+
+func (s *MessageTestSuite) TestGetSetStop() {
+	msg := gol.LogMessage{
+		"key": "value",
+	}
+
+	v, err := msg.GetStop()
+	assert.Equal(s.T(), time.Time{}, v)
+	assert.Equal(s.T(), fmt.Errorf("Message does not contain field stop"), err)
+
+	stop := time.Now()
+	msg.SetStop(stop)
+
+	v, err = msg.GetStop()
+	assert.Equal(s.T(), stop, v)
+	assert.Nil(s.T(), err)
+}
+
+func (s *MessageTestSuite) assertSeverityLevel(expected severity.Type, f gol.NewLogMessageFunc) {
 	msg := f()
 	severity, err := msg.GetSeverity()
 	assert.Nil(s.T(), err)
@@ -69,15 +106,15 @@ func (s *MessageTestSuite) assertSeverityLevel(expected severity.Type, f NewLogM
 }
 
 func (s *MessageTestSuite) TestNewSeverity() {
-	cases := map[int]NewLogMessageFunc{
-		severity.Emergency: NewEmergency,
-		severity.Alert:     NewAlert,
-		severity.Critical:  NewCritical,
-		severity.Error:     NewError,
-		severity.Warning:   NewWarning,
-		severity.Notice:    NewNotice,
-		severity.Info:      NewInfo,
-		severity.Debug:     NewDebug,
+	cases := map[int]gol.NewLogMessageFunc{
+		severity.Emergency: gol.NewEmergency,
+		severity.Alert:     gol.NewAlert,
+		severity.Critical:  gol.NewCritical,
+		severity.Error:     gol.NewError,
+		severity.Warning:   gol.NewWarning,
+		severity.Notice:    gol.NewNotice,
+		severity.Info:      gol.NewInfo,
+		severity.Debug:     gol.NewDebug,
 	}
 
 	for lvl, f := range cases {

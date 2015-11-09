@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 
-package gol
+package gol_test
 
 import (
 	"testing"
@@ -24,5 +24,6 @@ import (
 
 // TestSuite runs the test suites.
 func TestSuite(t *testing.T) {
+	suite.Run(t, new(BaseLoggerTestSuite))
 	suite.Run(t, new(MessageTestSuite))
 }

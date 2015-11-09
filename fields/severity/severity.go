@@ -40,7 +40,7 @@ const (
 	Debug
 )
 
-// Type numerical value for the log message severity as specified by RFC5424.
+// Type numerical value for the log message severity field as specified by RFC5424.
 type Type int
 
 // String returns a string representation of the severity level.

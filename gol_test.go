@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 
-package test
+package gol_test
 
 import (
 	"github.com/mediaFORGE/gol"

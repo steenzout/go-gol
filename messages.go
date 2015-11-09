@@ -2,6 +2,7 @@ package gol
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/mediaFORGE/gol/fields"
 	"github.com/mediaFORGE/gol/fields/severity"
@@ -10,7 +11,7 @@ import (
 // LogMessage is a log message.
 type LogMessage map[string]interface{}
 
-// Get returns the logger Severity level.
+// Get returns the value of the given logger message field.
 func (msg LogMessage) Get(f string) (i interface{}, err error) {
 	if v, ok := msg[f]; ok {
 		return v, nil
@@ -18,7 +19,7 @@ func (msg LogMessage) Get(f string) (i interface{}, err error) {
 	return nil, fmt.Errorf("Message does not contain field %s", f)
 }
 
-// GetSeverity returns the logger Severity level.
+// GetSeverity returns the value of the logger message severity level field.
 func (msg LogMessage) GetSeverity() (lvl severity.Type, err error) {
 	var v interface{}
 	if v, err = msg.Get(fields.Severity); err == nil {
@@ -27,12 +28,42 @@ func (msg LogMessage) GetSeverity() (lvl severity.Type, err error) {
 	return severity.Type(-1), err
 }
 
-// SetSeverity sets the logger Severity level.
+// SetSeverity sets the value of the logger message severity level field.
 func (msg LogMessage) SetSeverity(lvl severity.Type) (err error) {
 	if err = lvl.Validate(); err == nil {
 		msg[fields.Severity] = lvl
 	}
 	return
+}
+
+// GetStart returns the value of the logger message start field.
+func (msg LogMessage) GetStart() (s time.Time, err error) {
+	var v interface{}
+	if v, err = msg.Get(fields.Start); err == nil {
+		return v.(time.Time), nil
+	}
+	return time.Time{}, err
+}
+
+// SetStart sets the value of the logger message start field.
+func (msg LogMessage) SetStart(s time.Time) (err error) {
+	msg[fields.Start] = s
+	return nil
+}
+
+// GetStop returns the value of the logger message stop field.
+func (msg LogMessage) GetStop() (s time.Time, err error) {
+	var v interface{}
+	if v, err = msg.Get(fields.Stop); err == nil {
+		return v.(time.Time), nil
+	}
+	return time.Time{}, err
+}
+
+// SetStop sets the value of the logger message stop field.
+func (msg LogMessage) SetStop(s time.Time) (err error) {
+	msg[fields.Stop] = s
+	return nil
 }
 
 // NewLogMessageFunc is the function signature of LogMessage constructor functions.
