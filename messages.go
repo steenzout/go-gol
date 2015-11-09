@@ -1,8 +1,6 @@
 package gol
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -12,6 +10,11 @@ import (
 
 // LogMessage is a log message.
 type LogMessage map[string]interface{}
+
+// FieldLength returns the number of fields in the message.
+func (msg LogMessage) FieldLength() (n int) {
+	return len(msg)
+}
 
 // Get returns the value of the given logger message field.
 func (msg LogMessage) Get(f string) (i interface{}, err error) {
@@ -68,26 +71,6 @@ func (msg LogMessage) SetStop(s *time.Time) (err error) {
 	return nil
 }
 
-// JSON returns a JSON representation of this struct.
-func (msg LogMessage) JSON() (out string) {
-	byteArr, err := json.Marshal(msg)
-	if err != nil {
-		panic(err)
-	}
-	return fmt.Sprintf("%s\n", string(byteArr))
-}
-
-// String returns a string representation of this struct.
-func (msg LogMessage) String() (out string) {
-	var buffer bytes.Buffer
-
-	for k, v := range msg {
-		buffer.WriteString(fmt.Sprintf("%s=%s", k, v))
-	}
-	buffer.WriteString("\n")
-	return buffer.String()
-}
-
 // NewLogMessageFunc is the function signature of LogMessage constructor functions.
 type NewLogMessageFunc func(args ...interface{}) *LogMessage
 
@@ -133,7 +116,12 @@ func NewDebug(args ...interface{}) *LogMessage {
 
 // NewMessage build a log message with the given severity level.
 func NewMessage(l severity.Type, args ...interface{}) *LogMessage {
-	return &LogMessage{
+	msg := LogMessage{
 		fields.Severity: l,
 	}
+	for i := 0; i < len(args); i += 2 {
+		msg[args[i].(string)] = args[i+1]
+	}
+
+	return &msg
 }

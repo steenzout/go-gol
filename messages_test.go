@@ -31,6 +31,13 @@ type MessageTestSuite struct {
 	suite.Suite
 }
 
+func (s *MessageTestSuite) TestFieldLength() {
+	msg := gol.LogMessage{
+		"key": "value",
+	}
+	assert.Equal(s.T(), 1, msg.FieldLength())
+}
+
 func (s *MessageTestSuite) TestGet() {
 	msg := gol.LogMessage{
 		"key": "value",
@@ -99,17 +106,17 @@ func (s *MessageTestSuite) TestGetSetStop() {
 }
 
 func (s *MessageTestSuite) assertSeverityLevel(expected severity.Type, f gol.NewLogMessageFunc) {
-	msg := f()
+	msg := f("key", 1)
 	severity, err := msg.Severity()
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), expected, severity)
-}
 
-func (s *MessageTestSuite) TestJSON() {
-	msg := gol.LogMessage{
-		"key": "value",
+	if key, err := msg.Get("key"); err != nil {
+		assert.Fail(s.T(), err.Error())
+	} else {
+		assert.NotNil(s.T(), key)
+		assert.Equal(s.T(), 1, key)
 	}
-	assert.Equal(s.T(), "{\"key\":\"value\"}\n", msg.JSON())
 }
 
 func (s *MessageTestSuite) TestNewSeverity() {
@@ -127,11 +134,4 @@ func (s *MessageTestSuite) TestNewSeverity() {
 	for lvl, f := range cases {
 		s.assertSeverityLevel(severity.Type(lvl), f)
 	}
-}
-
-func (s *MessageTestSuite) TestString() {
-	msg := gol.LogMessage{
-		"key": "value",
-	}
-	assert.Equal(s.T(), "key=value\n", msg.String())
 }
