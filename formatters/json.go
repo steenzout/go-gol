@@ -26,7 +26,7 @@ import (
 // JSON struct for a generic JSON formatter.
 type JSON struct{}
 
-// JSON returns a JSON representation of this struct.
+// Format formats the log message.
 func (f JSON) Format(msg *gol.LogMessage) (string, error) {
 	byteArr, err := json.Marshal(msg)
 	if err != nil {

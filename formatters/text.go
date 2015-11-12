@@ -26,7 +26,7 @@ import (
 // Text struct for a generic text formatter.
 type Text struct{}
 
-// String returns a string representation of this struct.
+// Format formats the log message.
 func (f Text) Format(msg *gol.LogMessage) (string, error) {
 	lmsg := msg.FieldLength()
 	buffer := make([]string, lmsg, lmsg)
