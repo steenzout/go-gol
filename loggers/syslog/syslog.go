@@ -48,51 +48,38 @@ func New(network, raddr string, priority syslog.Priority, app string, lfmt gol.L
 // Send process log message.
 func (l *Logger) Send(m *gol.LogMessage) (err error) {
 	if m == nil {
-		fmt.Println("message is nil")
 		return
 	}
 	if l.Formatter() == nil {
-		fmt.Println("formatter is nil")
 		return fmt.Errorf("log formatter is nil")
 	}
 
 	var msg string
 	if msg, err = l.Formatter().Format(m); err != nil {
-		fmt.Println("message format error")
 		return
 	}
 
 	var lvl severity.Type
 	if lvl, err = m.Severity(); err != nil {
-		fmt.Println("severity error")
 		return
 	}
 
-	fmt.Println("message=", msg)
 	switch lvl {
 	case severity.Emergency:
-		fmt.Println("level=Emergency")
 		return l.writer.Emerg(msg)
 	case severity.Alert:
-		fmt.Println("level=Alert")
 		return l.writer.Alert(msg)
 	case severity.Critical:
-		fmt.Println("level=Critical")
 		return l.writer.Crit(msg)
 	case severity.Error:
-		fmt.Println("level=Error")
 		return l.writer.Err(msg)
 	case severity.Warning:
-		fmt.Println("level=Warning")
 		return l.writer.Warning(msg)
 	case severity.Notice:
-		fmt.Println("level=Notice")
 		return l.writer.Notice(msg)
 	case severity.Info:
-		fmt.Println("level=Info")
 		return l.writer.Info(msg)
 	case severity.Debug:
-		fmt.Println("level=Debug")
 		return l.writer.Debug(msg)
 	}
 
