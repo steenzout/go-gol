@@ -120,7 +120,7 @@ func (s *MessageTestSuite) assertSeverityLevel(expected severity.Type, f gol.New
 }
 
 func (s *MessageTestSuite) TestNewSeverity() {
-	cases := map[int]gol.NewLogMessageFunc{
+	cases := map[severity.Type]gol.NewLogMessageFunc{
 		severity.Emergency: gol.NewEmergency,
 		severity.Alert:     gol.NewAlert,
 		severity.Critical:  gol.NewCritical,

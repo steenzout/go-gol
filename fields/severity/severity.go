@@ -23,7 +23,7 @@ import (
 // http://tools.ietf.org/html/rfc5424
 const (
 	// Emergency severity level for system is unusable.
-	Emergency = iota
+	Emergency Type = iota
 	// Alert severity level for action must be taken immediately.
 	Alert
 	// Critical severity level for critical conditions.
