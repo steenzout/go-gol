@@ -17,10 +17,11 @@
 package main
 
 import (
+	"log/syslog"
+
 	"github.com/mediaFORGE/gol"
 	"github.com/mediaFORGE/gol/formatters"
 	mfsyslog "github.com/mediaFORGE/gol/loggers/syslog"
-	"log/syslog"
 )
 
 var log gol.Logger
