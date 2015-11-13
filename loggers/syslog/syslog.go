@@ -24,17 +24,17 @@ import (
 	"github.com/mediaFORGE/gol/fields/severity"
 )
 
+// Logger gol's syslog logger.
 type Logger struct {
 	gol.Log
 	writer *syslog.Writer
 }
 
 // New creates a syslog logger whose default severity level is INFO.
-func New(network, raddr string, priority syslog.Priority, app string, lfmt gol.LogFormatter) gol.Logger {
+func New(network, raddr string, priority syslog.Priority, app string, lfmt gol.LogFormatter) (l gol.Logger) {
 
 	if w, err := syslog.Dial(network, raddr, syslog.LOG_INFO, app); err != nil {
-		fmt.Println("syslog.Dial() failed: %s", err)
-		return nil
+		fmt.Printf("syslog.Dial() failed: %s\n", err)
 	} else {
 		l := &Logger{
 			Log:    gol.Log{},
@@ -43,6 +43,7 @@ func New(network, raddr string, priority syslog.Priority, app string, lfmt gol.L
 		l.SetFormatter(lfmt)
 		return l
 	}
+	return nil
 }
 
 // Send process log message.
