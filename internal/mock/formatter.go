@@ -31,11 +31,14 @@ func (m *MockLogFormatter) Format(msg *gol.LogMessage) (out string, err error) {
 
 	out = args.Get(0).(string)
 
-	if args.Get(1) == nil {
+	a1 := args.Get(1)
+	switch a1.(type) {
+	case error:
+		err, _ = a1.(error)
+	default:
 		err = nil
-	} else {
-		err = args.Get(1).(error)
 	}
+
 	return
 }
 
