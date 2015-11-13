@@ -22,11 +22,14 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type MockWriter struct {
+// Writer mock implementation of the io.Writer interface.
+type Writer struct {
 	mock.Mock
 }
 
-func (m *MockWriter) Write(p []byte) (n int, err error) {
+// Write writes the given bytes.
+// Returns the number of written bytes and error.
+func (m *Writer) Write(p []byte) (n int, err error) {
 	args := m.Mock.Called(p)
 
 	n = args.Get(0).(int)
@@ -39,4 +42,4 @@ func (m *MockWriter) Write(p []byte) (n int, err error) {
 	return
 }
 
-var _ io.Writer = (*MockWriter)(nil)
+var _ io.Writer = (*Writer)(nil)

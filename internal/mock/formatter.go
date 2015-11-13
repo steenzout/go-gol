@@ -22,11 +22,14 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type MockLogFormatter struct {
+// LogFormatter mock implementation of the gol.LogFormatter interface.
+type LogFormatter struct {
 	mock.Mock
 }
 
-func (m *MockLogFormatter) Format(msg *gol.LogMessage) (out string, err error) {
+// Format returns a string formatted version of the given message.
+// Returns message formatted string and error.
+func (m *LogFormatter) Format(msg *gol.LogMessage) (out string, err error) {
 	args := m.Mock.Called(msg)
 
 	out = args.Get(0).(string)
@@ -42,4 +45,4 @@ func (m *MockLogFormatter) Format(msg *gol.LogMessage) (out string, err error) {
 	return
 }
 
-var _ gol.LogFormatter = (*MockLogFormatter)(nil)
+var _ gol.LogFormatter = (*LogFormatter)(nil)

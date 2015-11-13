@@ -32,7 +32,7 @@ type LogTestSuite struct {
 
 type setupLogTest struct {
 	setUp func(
-		msg *gol.LogMessage, mf *mock.MockLogFilter, mfmt *mock.MockLogFormatter, mw *mock.MockWriter,
+		msg *gol.LogMessage, mf *mock.LogFilter, mfmt *mock.LogFormatter, mw *mock.Writer,
 	) *gol.Log
 	message *gol.LogMessage
 	output  string
@@ -43,7 +43,7 @@ func (s *LogTestSuite) TestGetSetFilter() {
 	l := gol.SimpleLog(nil, nil, nil)
 
 	assert.Nil(s.T(), l.Filter())
-	assert.Nil(s.T(), l.SetFilter(&mock.MockLogFilter{}))
+	assert.Nil(s.T(), l.SetFilter(&mock.LogFilter{}))
 	assert.NotNil(s.T(), l.Filter())
 
 	assert.Nil(s.T(), l.SetFilter(nil))
@@ -54,7 +54,7 @@ func (s *LogTestSuite) TestGetSetFormatter() {
 	l := gol.SimpleLog(nil, nil, nil)
 
 	assert.Nil(s.T(), l.Formatter())
-	assert.Nil(s.T(), l.SetFormatter(&mock.MockLogFormatter{}))
+	assert.Nil(s.T(), l.SetFormatter(&mock.LogFormatter{}))
 	assert.NotNil(s.T(), l.Formatter())
 
 	assert.Error(s.T(), l.SetFormatter(nil))
@@ -65,7 +65,7 @@ func (s *LogTestSuite) TestGetSetWriter() {
 	l := gol.SimpleLog(nil, nil, nil)
 
 	assert.Nil(s.T(), l.Writer())
-	assert.Nil(s.T(), l.SetWriter(&mock.MockWriter{}))
+	assert.Nil(s.T(), l.SetWriter(&mock.Writer{}))
 	assert.NotNil(s.T(), l.Writer())
 
 	assert.Error(s.T(), l.SetWriter(nil))
@@ -76,7 +76,7 @@ func (s *LogTestSuite) TestSend() {
 	in := map[string]setupLogTest{
 		"error": setupLogTest{
 			setUp: func(
-				msg *gol.LogMessage, mf *mock.MockLogFilter, mfmt *mock.MockLogFormatter, mw *mock.MockWriter,
+				msg *gol.LogMessage, mf *mock.LogFilter, mfmt *mock.LogFormatter, mw *mock.Writer,
 			) (logger *gol.Log) {
 				mf.Mock.On("Filter", msg).Return(false, nil)
 				mfmt.Mock.On("Format", msg).Return("ERROR", nil)
@@ -91,7 +91,7 @@ func (s *LogTestSuite) TestSend() {
 		},
 		"info": setupLogTest{
 			setUp: func(
-				msg *gol.LogMessage, mf *mock.MockLogFilter, mfmt *mock.MockLogFormatter, mw *mock.MockWriter,
+				msg *gol.LogMessage, mf *mock.LogFilter, mfmt *mock.LogFormatter, mw *mock.Writer,
 			) (logger *gol.Log) {
 				mf.Mock.On("Filter", msg).Return(true, nil)
 
@@ -105,9 +105,9 @@ func (s *LogTestSuite) TestSend() {
 	}
 
 	for _, t := range in {
-		mf := &mock.MockLogFilter{}
-		mfmt := &mock.MockLogFormatter{}
-		mw := &mock.MockWriter{}
+		mf := &mock.LogFilter{}
+		mfmt := &mock.LogFormatter{}
+		mw := &mock.Writer{}
 		logger := t.setUp(t.message, mf, mfmt, mw)
 
 		logger.Send(t.message)
@@ -119,9 +119,9 @@ func (s *LogTestSuite) TestSend() {
 }
 
 func (s *LogTestSuite) TestSendNilMessage() {
-	mf := &mock.MockLogFilter{}
-	mfmt := &mock.MockLogFormatter{}
-	mw := &mock.MockWriter{}
+	mf := &mock.LogFilter{}
+	mfmt := &mock.LogFormatter{}
+	mw := &mock.Writer{}
 	logger := gol.SimpleLog(mf, mfmt, mw)
 
 	assert.Nil(s.T(), logger.Send(nil))
@@ -129,7 +129,7 @@ func (s *LogTestSuite) TestSendNilMessage() {
 
 func (s *LogTestSuite) TestSendNilFormatter() {
 	msg := gol.NewDebug()
-	mf := &mock.MockLogFilter{}
+	mf := &mock.LogFilter{}
 	mf.Mock.On("Filter", msg).Return(false, nil)
 
 	logger := gol.SimpleLog(mf, nil, nil)
@@ -139,9 +139,9 @@ func (s *LogTestSuite) TestSendNilFormatter() {
 
 func (s *LogTestSuite) TestSendFormatError() {
 	msg := gol.NewDebug()
-	mf := &mock.MockLogFilter{}
+	mf := &mock.LogFilter{}
 	mf.Mock.On("Filter", msg).Return(false, nil)
-	mfmt := &mock.MockLogFormatter{}
+	mfmt := &mock.LogFormatter{}
 	mfmt.Mock.On("Format", msg).Return("", fmt.Errorf("unknown"))
 
 	logger := gol.SimpleLog(mf, mfmt, nil)
@@ -151,9 +151,9 @@ func (s *LogTestSuite) TestSendFormatError() {
 
 func (s *LogTestSuite) TestSendNilWriter() {
 	msg := gol.NewDebug()
-	mf := &mock.MockLogFilter{}
+	mf := &mock.LogFilter{}
 	mf.Mock.On("Filter", msg).Return(false, nil)
-	mfmt := &mock.MockLogFormatter{}
+	mfmt := &mock.LogFormatter{}
 	mfmt.Mock.On("Format", msg).Return("ERROR", nil)
 
 	logger := gol.SimpleLog(mf, mfmt, nil)

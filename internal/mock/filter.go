@@ -22,14 +22,17 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type MockLogFilter struct {
+// LogFilter mock implementation of the gol.LogFilter interface.
+type LogFilter struct {
 	mock.Mock
 }
 
-func (m *MockLogFilter) Filter(msg *gol.LogMessage) bool {
+// Filter performs a filter check on the given message.
+// Returns wether or not a given message should be filtered.
+func (m *LogFilter) Filter(msg *gol.LogMessage) bool {
 	args := m.Mock.Called(msg)
 
 	return args.Get(0).(bool)
 }
 
-var _ gol.LogFilter = (*MockLogFilter)(nil)
+var _ gol.LogFilter = (*LogFilter)(nil)

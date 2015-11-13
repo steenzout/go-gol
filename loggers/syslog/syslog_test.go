@@ -144,7 +144,7 @@ func (s *SyslogTestSuite) TestSendNilFormatter() {
 
 func (s *SyslogTestSuite) TestSendFormatterError() {
 	msg := gol.NewEmergency("message", "unknown")
-	m := &golmock.MockLogFormatter{}
+	m := &golmock.LogFormatter{}
 	m.On("Format", msg).Return("", fmt.Errorf("internal error"))
 
 	s.logger.SetFormatter(m)
