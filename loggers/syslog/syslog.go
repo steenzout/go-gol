@@ -29,7 +29,7 @@ type Logger struct {
 	writer *syslog.Writer
 }
 
-// New creates a syslog logger.
+// New creates a syslog logger whose default severity level is INFO.
 func New(network, raddr string, priority syslog.Priority, app string, lfmt gol.LogFormatter) gol.Logger {
 
 	if w, err := syslog.Dial(network, raddr, syslog.LOG_INFO, app); err != nil {
@@ -81,9 +81,9 @@ func (l *Logger) Send(m *gol.LogMessage) (err error) {
 		return l.writer.Info(msg)
 	case severity.Debug:
 		return l.writer.Debug(msg)
+	default:
+		return l.writer.Info(msg)
 	}
-
-	return nil
 }
 
 var _ gol.Logger = (*Logger)(nil)
