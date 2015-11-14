@@ -39,25 +39,16 @@ type MockUDPServer struct {
 	t *testing.T
 }
 
-func (m *MockUDPServer) ReadMessage(conn *net.UDPConn, buf []byte) {
+func (m *MockUDPServer) ReadMessage(conn *net.UDPConn, buf []byte) string {
 	n, addr, err := conn.ReadFromUDP(buf)
 	assert.Nil(m.t, err)
 	assert.NotNil(m.t, "abc", addr)
 	assert.True(m.t, n > 0)
 
-	msg := string(buf[0:n])
-	m.receivedMessage(msg)
-
-	if err != nil {
-		fmt.Println("Error: ", err)
-	}
+	return string(buf[0:n])
 }
 
-func (m *MockUDPServer) receivedMessage(msg string) {
-	m.Mock.Called(msg)
-}
-
-func (m *MockUDPServer) Run(ch chan bool, readch chan bool) {
+func (m *MockUDPServer) Run(ch chan bool, readch chan bool, msgchan chan string) {
 	if addr, err := net.ResolveUDPAddr("udp", ":10001"); err != nil {
 		assert.Fail(m.t, "could not resolve UDP server address")
 	} else {
@@ -75,7 +66,7 @@ func (m *MockUDPServer) Run(ch chan bool, readch chan bool) {
 				if !<-readch {
 					break // end loop execution and end go routine
 				}
-				m.ReadMessage(conn, buf)
+				msgchan <- m.ReadMessage(conn, buf)
 			}
 		}
 	}
@@ -97,35 +88,22 @@ func (s *SyslogTestSuite) TestSend() {
 
 	syncch := make(chan bool, 1)
 	readch := make(chan bool, 1)
-	go udpserver.Run(syncch, readch)
+	msgch := make(chan string, 1)
+	go udpserver.Run(syncch, readch, msgch)
 	<-syncch
 
 	var lvl severity.Type
 	for lvl = severity.Emergency; lvl <= severity.Debug; lvl++ {
 		s.logger.Send(gol.NewMessage(lvl, "message", "unknown"))
 		readch <- true // read message sent
+		assert.True(s.T(), strings.Contains(<-msgch, lvl.String()))
 	}
 
 	// invalid severity will be sent with the default logger severity level
 	s.logger.Send(gol.NewMessage(severity.Debug+1, "invalid", "severity"))
-	readch <- true  // read message sent
+	readch <- true // read message sent
+	assert.True(s.T(), strings.Contains(<-msgch, "severity=UNKNOWN"))
 	readch <- false // end concurrent go routine
-
-	udpserver.AssertExpectations(s.T())
-
-	found := 0
-	for lvl = severity.Emergency; lvl <= severity.Debug; lvl++ {
-		for _, call := range udpserver.Calls {
-			if call.Method == "receivedMessage" {
-				for _, arg := range call.Arguments {
-					if strings.Contains(arg.(string), lvl.String()) {
-						found++
-					}
-				}
-			}
-		}
-	}
-	assert.Equal(s.T(), 8, found)
 }
 
 func (s *SyslogTestSuite) TestSendMessageWithoutSeverity() {
