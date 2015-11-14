@@ -32,18 +32,16 @@ type Logger struct {
 
 // New creates a syslog logger whose default severity level is INFO.
 func New(network, raddr string, priority syslog.Priority, app string, lfmt gol.LogFormatter) (l gol.Logger) {
-
 	if w, err := syslog.Dial(network, raddr, syslog.LOG_INFO, app); err != nil {
 		fmt.Printf("syslog.Dial() failed: %s\n", err)
 	} else {
-		l := &Logger{
+		l = &Logger{
 			Log:    gol.Log{},
 			writer: w,
 		}
 		l.SetFormatter(lfmt)
-		return l
 	}
-	return nil
+	return l
 }
 
 // Send process log message.
