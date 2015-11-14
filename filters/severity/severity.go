@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 
-package filters
+package severity
 
 import (
 	"github.com/mediaFORGE/gol"
@@ -25,7 +25,7 @@ type Severity struct {
 	minimum severity.Type
 }
 
-func NewSeverity(s severity.Type) gol.LogFilter {
+func New(s severity.Type) gol.LogFilter {
 	return &Severity{
 		minimum: s,
 	}

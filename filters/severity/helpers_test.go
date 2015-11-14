@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 
-package filters_test
+package severity_test
 
 import (
 	"testing"
@@ -24,5 +24,5 @@ import (
 
 // TestSuite runs the test suites.
 func TestSuite(t *testing.T) {
-	suite.Run(t, new(SeverityTestSuite))
+	suite.Run(t, new(FilterTestSuite))
 }

@@ -14,23 +14,23 @@
 // limitations under the License.
 //
 
-package filters_test
+package severity_test
 
 import (
+	"github.com/mediaFORGE/gol"
+	field "github.com/mediaFORGE/gol/fields/severity"
+	filter "github.com/mediaFORGE/gol/filters/severity"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-
-	"github.com/mediaFORGE/gol"
-	"github.com/mediaFORGE/gol/fields/severity"
-	"github.com/mediaFORGE/gol/filters"
 )
 
-type SeverityTestSuite struct {
+type FilterTestSuite struct {
 	suite.Suite
 }
 
-func (s *SeverityTestSuite) TestFilter() {
-	f := filters.NewSeverity(severity.Type(severity.Emergency))
+func (s *FilterTestSuite) TestFilter() {
+	f := filter.New(field.Type(field.Emergency))
 	cases := []gol.NewLogMessageFunc{
 		gol.NewAlert, gol.NewCritical, gol.NewError, gol.NewWarning, gol.NewNotice, gol.NewInfo, gol.NewDebug,
 	}
@@ -40,7 +40,7 @@ func (s *SeverityTestSuite) TestFilter() {
 		assert.True(s.T(), f.Filter(newFunc()))
 	}
 
-	f = filters.NewSeverity(severity.Type(severity.Debug))
+	f = filter.New(field.Type(field.Debug))
 	cases = []gol.NewLogMessageFunc{
 		gol.NewEmergency, gol.NewAlert, gol.NewCritical, gol.NewError, gol.NewWarning, gol.NewNotice, gol.NewInfo,
 	}
@@ -51,7 +51,7 @@ func (s *SeverityTestSuite) TestFilter() {
 	assert.False(s.T(), f.Filter(gol.NewDebug()))
 }
 
-func (s *SeverityTestSuite) TestFilterNoSeverityField() {
-	f := filters.NewSeverity(severity.Type(severity.Debug))
+func (s *FilterTestSuite) TestFilterNoSeverityField() {
+	f := filter.New(field.Type(field.Debug))
 	assert.True(s.T(), f.Filter(&gol.LogMessage{}))
 }
