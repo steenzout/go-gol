@@ -33,13 +33,13 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-// MockUDPServer
+// MockUDPServer mock implementation of a UDP server.
 type MockUDPServer struct {
 	mock.Mock
 	t *testing.T
 }
 
-func (m *MockUDPServer) ReadMessage(conn *net.UDPConn, buf []byte) string {
+func (m *MockUDPServer) read(conn *net.UDPConn, buf []byte) string {
 	n, addr, err := conn.ReadFromUDP(buf)
 	assert.Nil(m.t, err)
 	assert.NotNil(m.t, "abc", addr)
@@ -66,23 +66,23 @@ func (m *MockUDPServer) Run(ch chan bool, readch chan bool, msgchan chan string)
 				if !<-readch {
 					break // end loop execution and end go routine
 				}
-				msgchan <- m.ReadMessage(conn, buf)
+				msgchan <- m.read(conn, buf)
 			}
 		}
 	}
 }
 
-// SyslogTestSuite test suite for the github.com/mediaFORGE/gol/loggers/syslog package.
-type SyslogTestSuite struct {
+// LoggerTestSuite test suite for the github.com/mediaFORGE/gol/loggers/syslog package.
+type LoggerTestSuite struct {
 	suite.Suite
 	logger gol.Logger
 }
 
-func (s *SyslogTestSuite) SetupTest() {
+func (s *LoggerTestSuite) SetupTest() {
 	s.logger = golsys.New("udp", ":10001", syslog.LOG_INFO, "test", &formatters.Text{})
 }
 
-func (s *SyslogTestSuite) TestSend() {
+func (s *LoggerTestSuite) TestSend() {
 	udpserver := MockUDPServer{t: s.T()}
 	udpserver.Mock.On("receivedMessage", mock.Anything).Return(nil)
 
@@ -106,21 +106,21 @@ func (s *SyslogTestSuite) TestSend() {
 	readch <- false // end concurrent go routine
 }
 
-func (s *SyslogTestSuite) TestSendMessageWithoutSeverity() {
+func (s *LoggerTestSuite) TestSendMessageWithoutSeverity() {
 	assert.Error(s.T(), s.logger.Send(&gol.LogMessage{"message": "unknown"}))
 }
 
-func (s *SyslogTestSuite) TestSendNil() {
+func (s *LoggerTestSuite) TestSendNil() {
 	assert.Nil(s.T(), s.logger.Send(nil))
 }
 
-func (s *SyslogTestSuite) TestSendNilFormatter() {
+func (s *LoggerTestSuite) TestSendNilFormatter() {
 	// reset logger built by SetupTest
 	s.logger = golsys.New("udp", ":10001", syslog.LOG_INFO, "test", nil)
 	assert.Error(s.T(), s.logger.Send(gol.NewEmergency("message", "unknown")))
 }
 
-func (s *SyslogTestSuite) TestSendFormatterError() {
+func (s *LoggerTestSuite) TestSendFormatterError() {
 	msg := gol.NewEmergency("message", "unknown")
 	m := &golmock.LogFormatter{}
 	m.On("Format", msg).Return("", fmt.Errorf("internal error"))

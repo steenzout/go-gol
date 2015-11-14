@@ -22,6 +22,7 @@ import (
 
 	"github.com/mediaFORGE/gol"
 	"github.com/mediaFORGE/gol/formatters"
+	"github.com/mediaFORGE/gol/loggers/simple"
 )
 
 var log gol.Logger
@@ -33,7 +34,7 @@ func init() {
 	}
 
 	txtFmt := &formatters.Text{}
-	log = gol.SimpleLog(nil, txtFmt, file)
+	log = simple.New(nil, txtFmt, file)
 }
 
 func main() {

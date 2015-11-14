@@ -14,22 +14,15 @@
 // limitations under the License.
 //
 
-package main
+package simple_test
 
 import (
-	"os"
+	"testing"
 
-	"github.com/mediaFORGE/gol"
-	"github.com/mediaFORGE/gol/formatters"
-	"github.com/mediaFORGE/gol/loggers/simple"
+	"github.com/stretchr/testify/suite"
 )
 
-var txtFmt = &formatters.Text{}
-var log gol.Logger = simple.New(nil, txtFmt, os.Stdout)
-var errorLog gol.Logger = simple.New(nil, txtFmt, os.Stderr)
-
-func main() {
-	log.Send(&gol.LogMessage{"message": "written to log"})
-
-	errorLog.Send(&gol.LogMessage{"message": "written to error log"})
+// TestSuite runs the test suites.
+func TestSuite(t *testing.T) {
+	suite.Run(t, new(LoggerTestSuite))
 }

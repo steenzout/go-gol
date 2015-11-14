@@ -22,6 +22,7 @@ import (
 	"github.com/mediaFORGE/gol"
 	"github.com/mediaFORGE/gol/fields/severity"
 	"github.com/mediaFORGE/gol/formatters"
+	"github.com/mediaFORGE/gol/loggers/simple"
 )
 
 type ErrorFilter struct{}
@@ -51,8 +52,8 @@ func (f *InfoFilter) Filter(msg *gol.LogMessage) bool {
 var _ gol.LogFilter = (*InfoFilter)(nil)
 
 var txtFmt = &formatters.Text{}
-var log gol.Logger = gol.SimpleLog(&InfoFilter{}, txtFmt, os.Stdout)
-var errorLog gol.Logger = gol.SimpleLog(&ErrorFilter{}, txtFmt, os.Stderr)
+var log gol.Logger = simple.New(&InfoFilter{}, txtFmt, os.Stdout)
+var errorLog gol.Logger = simple.New(&ErrorFilter{}, txtFmt, os.Stderr)
 
 func main() {
 	log.Send(&gol.LogMessage{"hello": "world!"})

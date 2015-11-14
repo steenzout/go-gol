@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/mediaFORGE/gol"
+	"github.com/mediaFORGE/gol/loggers/simple"
 )
 
 // Custom struct for a custom formatter.
@@ -27,7 +28,7 @@ func (f Custom) Format(msg *gol.LogMessage) (string, error) {
 
 var _ gol.LogFormatter = (*Custom)(nil)
 
-var logger gol.Logger = gol.SimpleLog(nil, &Custom{}, os.Stdout)
+var logger gol.Logger = simple.New(nil, &Custom{}, os.Stdout)
 
 func main() {
 	// this will be written to stderr

@@ -24,5 +24,5 @@ import (
 
 // TestSuite runs the test suites.
 func TestSuite(t *testing.T) {
-	suite.Run(t, new(SyslogTestSuite))
+	suite.Run(t, new(LoggerTestSuite))
 }

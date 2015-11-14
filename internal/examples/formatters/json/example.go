@@ -21,10 +21,11 @@ import (
 
 	"github.com/mediaFORGE/gol"
 	"github.com/mediaFORGE/gol/formatters"
+	"github.com/mediaFORGE/gol/loggers/simple"
 )
 
 var lfmt = &formatters.JSON{}
-var log gol.Logger = gol.SimpleLog(nil, lfmt, os.Stdout)
+var log gol.Logger = simple.New(nil, lfmt, os.Stdout)
 
 func main() {
 	log.Send(gol.NewInfo("message", "example execution started"))

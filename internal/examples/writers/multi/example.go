@@ -23,6 +23,7 @@ import (
 
 	"github.com/mediaFORGE/gol"
 	"github.com/mediaFORGE/gol/formatters"
+	"github.com/mediaFORGE/gol/loggers/simple"
 )
 
 var log gol.Logger
@@ -36,7 +37,7 @@ func init() {
 	multi := io.MultiWriter(file, os.Stdout)
 
 	txtFmt := &formatters.Text{}
-	log = gol.SimpleLog(nil, txtFmt, multi)
+	log = simple.New(nil, txtFmt, multi)
 }
 
 func main() {

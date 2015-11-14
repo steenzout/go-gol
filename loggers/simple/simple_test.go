@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 
-package gol_test
+package simple_test
 
 import (
 	"fmt"
@@ -22,25 +22,26 @@ import (
 	"github.com/mediaFORGE/gol"
 	"github.com/mediaFORGE/gol/internal/mock"
 
+	"github.com/mediaFORGE/gol/loggers/simple"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
 
-type LogTestSuite struct {
+type LoggerTestSuite struct {
 	suite.Suite
 }
 
 type setupLogTest struct {
 	setUp func(
 		msg *gol.LogMessage, mf *mock.LogFilter, mfmt *mock.LogFormatter, mw *mock.Writer,
-	) *gol.Log
+	) *simple.Logger
 	message *gol.LogMessage
 	output  string
 }
 
-func (s *LogTestSuite) TestGetSetFilter() {
+func (s *LoggerTestSuite) TestGetSetFilter() {
 
-	l := gol.SimpleLog(nil, nil, nil)
+	l := simple.New(nil, nil, nil)
 
 	assert.Nil(s.T(), l.Filter())
 	assert.Nil(s.T(), l.SetFilter(&mock.LogFilter{}))
@@ -49,9 +50,9 @@ func (s *LogTestSuite) TestGetSetFilter() {
 	assert.Nil(s.T(), l.SetFilter(nil))
 }
 
-func (s *LogTestSuite) TestGetSetFormatter() {
+func (s *LoggerTestSuite) TestGetSetFormatter() {
 
-	l := gol.SimpleLog(nil, nil, nil)
+	l := simple.New(nil, nil, nil)
 
 	assert.Nil(s.T(), l.Formatter())
 	assert.Nil(s.T(), l.SetFormatter(&mock.LogFormatter{}))
@@ -60,9 +61,9 @@ func (s *LogTestSuite) TestGetSetFormatter() {
 	assert.Error(s.T(), l.SetFormatter(nil))
 }
 
-func (s *LogTestSuite) TestGetSetWriter() {
+func (s *LoggerTestSuite) TestGetSetWriter() {
 
-	l := gol.SimpleLog(nil, nil, nil)
+	l := simple.New(nil, nil, nil)
 
 	assert.Nil(s.T(), l.Writer())
 	assert.Nil(s.T(), l.SetWriter(&mock.Writer{}))
@@ -71,18 +72,18 @@ func (s *LogTestSuite) TestGetSetWriter() {
 	assert.Error(s.T(), l.SetWriter(nil))
 }
 
-func (s *LogTestSuite) TestSend() {
+func (s *LoggerTestSuite) TestSend() {
 
 	in := map[string]setupLogTest{
 		"error": setupLogTest{
 			setUp: func(
 				msg *gol.LogMessage, mf *mock.LogFilter, mfmt *mock.LogFormatter, mw *mock.Writer,
-			) (logger *gol.Log) {
+			) (logger *simple.Logger) {
 				mf.Mock.On("Filter", msg).Return(false, nil)
 				mfmt.Mock.On("Format", msg).Return("ERROR", nil)
 				mw.Mock.On("Write", []byte("ERROR")).Return(5, nil)
 
-				logger = gol.SimpleLog(mf, mfmt, mw)
+				logger = simple.New(mf, mfmt, mw)
 
 				return
 			},
@@ -92,10 +93,10 @@ func (s *LogTestSuite) TestSend() {
 		"info": setupLogTest{
 			setUp: func(
 				msg *gol.LogMessage, mf *mock.LogFilter, mfmt *mock.LogFormatter, mw *mock.Writer,
-			) (logger *gol.Log) {
+			) (logger *simple.Logger) {
 				mf.Mock.On("Filter", msg).Return(true, nil)
 
-				logger = gol.SimpleLog(mf, mfmt, mw)
+				logger = simple.New(mf, mfmt, mw)
 
 				return
 			},
@@ -118,45 +119,45 @@ func (s *LogTestSuite) TestSend() {
 	}
 }
 
-func (s *LogTestSuite) TestSendNilMessage() {
+func (s *LoggerTestSuite) TestSendNilMessage() {
 	mf := &mock.LogFilter{}
 	mfmt := &mock.LogFormatter{}
 	mw := &mock.Writer{}
-	logger := gol.SimpleLog(mf, mfmt, mw)
+	logger := simple.New(mf, mfmt, mw)
 
 	assert.Nil(s.T(), logger.Send(nil))
 }
 
-func (s *LogTestSuite) TestSendNilFormatter() {
+func (s *LoggerTestSuite) TestSendNilFormatter() {
 	msg := gol.NewDebug()
 	mf := &mock.LogFilter{}
 	mf.Mock.On("Filter", msg).Return(false, nil)
 
-	logger := gol.SimpleLog(mf, nil, nil)
+	logger := simple.New(mf, nil, nil)
 
 	assert.Error(s.T(), logger.Send(msg))
 }
 
-func (s *LogTestSuite) TestSendFormatError() {
+func (s *LoggerTestSuite) TestSendFormatError() {
 	msg := gol.NewDebug()
 	mf := &mock.LogFilter{}
 	mf.Mock.On("Filter", msg).Return(false, nil)
 	mfmt := &mock.LogFormatter{}
 	mfmt.Mock.On("Format", msg).Return("", fmt.Errorf("unknown"))
 
-	logger := gol.SimpleLog(mf, mfmt, nil)
+	logger := simple.New(mf, mfmt, nil)
 
 	assert.Error(s.T(), logger.Send(msg))
 }
 
-func (s *LogTestSuite) TestSendNilWriter() {
+func (s *LoggerTestSuite) TestSendNilWriter() {
 	msg := gol.NewDebug()
 	mf := &mock.LogFilter{}
 	mf.Mock.On("Filter", msg).Return(false, nil)
 	mfmt := &mock.LogFormatter{}
 	mfmt.Mock.On("Format", msg).Return("ERROR", nil)
 
-	logger := gol.SimpleLog(mf, mfmt, nil)
+	logger := simple.New(mf, mfmt, nil)
 
 	assert.Error(s.T(), logger.Send(msg))
 }

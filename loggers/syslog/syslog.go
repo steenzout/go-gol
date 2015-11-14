@@ -22,11 +22,12 @@ import (
 
 	"github.com/mediaFORGE/gol"
 	"github.com/mediaFORGE/gol/fields/severity"
+	"github.com/mediaFORGE/gol/loggers/simple"
 )
 
 // Logger gol's syslog logger.
 type Logger struct {
-	gol.Log
+	simple.Logger
 	writer *syslog.Writer
 }
 
@@ -36,7 +37,7 @@ func New(network, raddr string, priority syslog.Priority, app string, lfmt gol.L
 		fmt.Printf("syslog.Dial() failed: %s\n", err)
 	} else {
 		l = &Logger{
-			Log:    gol.Log{},
+			Logger: simple.Logger{},
 			writer: w,
 		}
 		l.SetFormatter(lfmt)

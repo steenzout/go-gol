@@ -24,6 +24,5 @@ import (
 
 // TestSuite runs the test suites.
 func TestSuite(t *testing.T) {
-	suite.Run(t, new(LogTestSuite))
 	suite.Run(t, new(MessageTestSuite))
 }
