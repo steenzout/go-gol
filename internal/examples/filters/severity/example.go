@@ -20,14 +20,14 @@ import (
 	"os"
 
 	"github.com/mediaFORGE/gol"
-	"github.com/mediaFORGE/gol/fields/severity"
-	"github.com/mediaFORGE/gol/filters"
+	field "github.com/mediaFORGE/gol/fields/severity"
+	filter "github.com/mediaFORGE/gol/filters/severity"
 	"github.com/mediaFORGE/gol/formatters"
 	"github.com/mediaFORGE/gol/loggers/simple"
 )
 
 var txtFmt = &formatters.Text{}
-var errorLog gol.Logger = simple.New(filters.NewSeverity(severity.Error), txtFmt, os.Stderr)
+var errorLog gol.Logger = simple.New(filter.New(field.Error), txtFmt, os.Stderr)
 
 func main() {
 	// this will be written to stderr
