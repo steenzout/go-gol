@@ -28,7 +28,7 @@ type LogFilter struct {
 }
 
 // Filter performs a filter check on the given message.
-// Returns wether or not a given message should be filtered.
+// Returns whether or not a given message should be filtered.
 func (m *LogFilter) Filter(msg *gol.LogMessage) bool {
 	args := m.Mock.Called(msg)
 
