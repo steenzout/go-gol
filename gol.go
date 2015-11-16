@@ -40,3 +40,19 @@ type Logger interface {
 	SetFormatter(LogFormatter) error
 	SetWriter(io.Writer) error
 }
+
+// LoggerManager the interface to manage an application set of loggers.
+type LoggerManager interface {
+	Deregister(n string) error
+	Disable(n string) error
+	Enable(n string) error
+	IsEnabled(n string) (bool, error)
+	List() []string
+	Register(n string, l Logger) error
+}
+
+// Manager is the instance responsible for handling log messages and sending them to all registered loggers.
+var Manager LoggerManager
+
+// LogChannel the channel to pass log messages from the application to the logger manager.
+var LogChannel = make(chan *LogMessage, 1024)
