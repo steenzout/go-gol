@@ -21,16 +21,20 @@ import (
 	"github.com/mediaFORGE/gol/fields/severity"
 )
 
+// Severity the struct for the filter.
 type Severity struct {
 	minimum severity.Type
 }
 
+// New creates a severity filter.
 func New(s severity.Type) gol.LogFilter {
 	return &Severity{
 		minimum: s,
 	}
 }
 
+// Filter performs a filter check on the given message.
+// Returns whether or not a given message should be filtered.
 func (f Severity) Filter(msg *gol.LogMessage) bool {
 
 	if s, err := msg.Severity(); err != nil {

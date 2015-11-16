@@ -22,16 +22,20 @@ import (
 	"github.com/mediaFORGE/gol"
 )
 
+// Threshold the struct for the filter.
 type Threshold struct {
 	threshold time.Duration
 }
 
+// New creates a threshold filter.
 func New(d time.Duration) gol.LogFilter {
 	return &Threshold{
 		threshold: d,
 	}
 }
 
+// Filter performs a filter check on the given message.
+// Returns whether or not a given message should be filtered.
 func (f Threshold) Filter(msg *gol.LogMessage) bool {
 	var start *time.Time
 	var stop *time.Time
