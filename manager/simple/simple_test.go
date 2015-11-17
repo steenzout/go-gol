@@ -18,18 +18,23 @@ package simple_test
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/mediaFORGE/gol"
-	"github.com/mediaFORGE/gol/loggers/mock"
+	mfmock "github.com/mediaFORGE/gol/internal/mock"
+	logger_mock "github.com/mediaFORGE/gol/loggers/mock"
+	logger_simple "github.com/mediaFORGE/gol/loggers/simple"
 	"github.com/mediaFORGE/gol/manager/simple"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 )
 
 type ManagerTestSuite struct {
 	suite.Suite
-	manager gol.LoggerManager
+	manager     gol.LoggerManager
+	testChannel chan *gol.LogMessage
 }
 
 func (s *ManagerTestSuite) testIsEnabled(n string, b bool, e error) {
@@ -46,12 +51,17 @@ func (s *ManagerTestSuite) testIsEnabled(n string, b bool, e error) {
 
 func (s *ManagerTestSuite) SetupTest() {
 	s.manager = simple.New()
+	s.testChannel = make(chan *gol.LogMessage, 1)
+}
+
+func (s *ManagerTestSuite) TearDownTest() {
+	close(s.testChannel)
 }
 
 func (s *ManagerTestSuite) TestDeregister() {
 	// setup
-	logger := mock.New()
-	s.manager.Register("mock", logger)
+	l := logger_mock.New()
+	s.manager.Register("mock", l)
 
 	// deregister
 	assert.Nil(s.T(), s.manager.Deregister("mock"))
@@ -63,8 +73,8 @@ func (s *ManagerTestSuite) TestDeregister() {
 
 func (s *ManagerTestSuite) TestDisable() {
 	// setup
-	logger := mock.New()
-	s.manager.Register("mock", logger)
+	l := logger_mock.New()
+	s.manager.Register("mock", l)
 
 	// disable
 	assert.Nil(s.T(), s.manager.Disable("mock"))
@@ -76,8 +86,8 @@ func (s *ManagerTestSuite) TestDisable() {
 
 func (s *ManagerTestSuite) TestEnable() {
 	// setup
-	logger := mock.New()
-	s.manager.Register("mock", logger)
+	l := logger_mock.New()
+	s.manager.Register("mock", l)
 
 	// registered logger is enabled by default
 	s.testIsEnabled("mock", true, nil)
@@ -93,8 +103,8 @@ func (s *ManagerTestSuite) TestEnable() {
 
 func (s *ManagerTestSuite) TestIsEnabled() {
 	// setup
-	logger := mock.New()
-	s.manager.Register("mock", logger)
+	l := logger_mock.New()
+	s.manager.Register("mock", l)
 
 	// enabled logger
 	s.testIsEnabled("mock", true, nil)
@@ -110,22 +120,57 @@ func (s *ManagerTestSuite) TestIsEnabled() {
 func (s *ManagerTestSuite) TestList() {
 	assert.Equal(s.T(), []string{}, s.manager.List())
 
-	logger := mock.New()
-	assert.Nil(s.T(), s.manager.Register("mock", logger))
+	l := logger_mock.New()
+	assert.Nil(s.T(), s.manager.Register("mock", l))
 	assert.Equal(s.T(), []string{"mock"}, s.manager.List())
 }
 
 func (s *ManagerTestSuite) TestRegister() {
-	logger := mock.New()
-	assert.Nil(s.T(), s.manager.Register("mock", logger))
+	l := logger_mock.New()
+	assert.Nil(s.T(), s.manager.Register("mock", l))
 	assert.Equal(s.T(), []string{"mock"}, s.manager.List())
 	s.testIsEnabled("mock", true, nil)
 
 	// duplicate
-	assert.Nil(s.T(), s.manager.Register("mock", logger))
+	assert.Nil(s.T(), s.manager.Register("mock", l))
 	assert.Equal(s.T(), []string{"mock"}, s.manager.List())
 	s.testIsEnabled("mock", true, nil)
 
 	// nil
 	assert.NotNil(s.T(), s.manager.Register("mock", nil))
+}
+
+func (s *ManagerTestSuite) TestRun() {
+	m := gol.NewEmergency("field", "value")
+
+	// l1 will not filter the message
+	mf1 := &mfmock.LogFilter{}
+	mf1.On("Filter", m).Return(false)
+	mfmt1 := &mfmock.LogFormatter{}
+	mfmt1.On("Format", m).Return("EMERGENCY field=value", nil)
+	mw1 := &mfmock.Writer{}
+	mw1.On("Write", mock.Anything).Return(21, nil)
+	l1 := logger_simple.New(mf1, mfmt1, mw1)
+
+	// l2 will filter the message
+	mf2 := &mfmock.LogFilter{}
+	mf2.On("Filter", m).Return(true)
+	mfmt2 := &mfmock.LogFormatter{}
+	mw2 := &mfmock.Writer{}
+	l2 := logger_simple.New(mf2, mfmt2, mw2)
+
+	s.manager.Register("l1", l1)
+	s.manager.Register("l2", l2)
+
+	go s.manager.Run(s.testChannel)
+	s.testChannel <- m
+	time.Sleep(1 * time.Second)
+
+	mf1.AssertExpectations(s.T())
+	mfmt1.AssertExpectations(s.T())
+	mw1.AssertExpectations(s.T())
+
+	mf2.AssertExpectations(s.T())
+	mfmt2.AssertExpectations(s.T())
+	mw2.AssertExpectations(s.T())
 }

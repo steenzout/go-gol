@@ -33,8 +33,6 @@ type Manager struct {
 	loggers map[string]entry
 }
 
-var _ gol.LoggerManager = (*Manager)(nil)
-
 // New creates a simple implementation of a logger manager.
 func New() gol.LoggerManager {
 	return &Manager{
@@ -114,3 +112,20 @@ func (m *Manager) Register(n string, l gol.Logger) error {
 	}
 	return nil
 }
+
+// Run keep reading from the input LogMessage channel and send messages to each logger.
+func (m *Manager) Run(c <-chan *gol.LogMessage) {
+	go func() {
+		for msg := range c {
+			if m != nil {
+				for _, l := range m.loggers {
+					if l.status {
+						l.logger.Send(msg)
+					}
+				}
+			}
+		}
+	}()
+}
+
+var _ gol.LoggerManager = (*Manager)(nil)
