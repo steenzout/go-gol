@@ -56,7 +56,7 @@ func (l *Logger) Send(m *gol.LogMessage) (err error) {
 		return
 	}
 
-	if l.Filter() != nil && l.Filter().Filter(m) {
+	if l.Filter() != nil && l.filter.Filter(m) {
 		return
 	}
 
