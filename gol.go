@@ -48,6 +48,7 @@ type LoggerManager interface {
 	Enable(n string) error
 	IsEnabled(n string) (bool, error)
 	List() []string
+	Run(<-chan *LogMessage)
 	Register(n string, l Logger) error
 }
 
