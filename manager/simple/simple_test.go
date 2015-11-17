@@ -31,10 +31,14 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
+const (
+	// Capacity the number of messages the log message channel can hold.
+	Capacity = 10
+)
+
 type ManagerTestSuite struct {
 	suite.Suite
-	manager     gol.LoggerManager
-	testChannel chan *gol.LogMessage
+	manager gol.LoggerManager
 }
 
 func (s *ManagerTestSuite) testIsEnabled(n string, b bool, e error) {
@@ -50,12 +54,7 @@ func (s *ManagerTestSuite) testIsEnabled(n string, b bool, e error) {
 }
 
 func (s *ManagerTestSuite) SetupTest() {
-	s.manager = simple.New()
-	s.testChannel = make(chan *gol.LogMessage, 1)
-}
-
-func (s *ManagerTestSuite) TearDownTest() {
-	close(s.testChannel)
+	s.manager = simple.New(Capacity)
 }
 
 func (s *ManagerTestSuite) TestDeregister() {
@@ -140,7 +139,7 @@ func (s *ManagerTestSuite) TestRegister() {
 	assert.NotNil(s.T(), s.manager.Register("mock", nil))
 }
 
-func (s *ManagerTestSuite) TestRun() {
+func (s *ManagerTestSuite) TestSend() {
 	m := gol.NewEmergency("field", "value")
 
 	// l1 will not filter the message
@@ -162,8 +161,8 @@ func (s *ManagerTestSuite) TestRun() {
 	s.manager.Register("l1", l1)
 	s.manager.Register("l2", l2)
 
-	go s.manager.Run(s.testChannel)
-	s.testChannel <- m
+	s.manager.Run()
+	assert.Nil(s.T(), s.manager.Send(m))
 	time.Sleep(1 * time.Second)
 
 	mf1.AssertExpectations(s.T())
@@ -173,4 +172,10 @@ func (s *ManagerTestSuite) TestRun() {
 	mf2.AssertExpectations(s.T())
 	mfmt2.AssertExpectations(s.T())
 	mw2.AssertExpectations(s.T())
+}
+
+func (s *ManagerTestSuite) TestSendWithoutRun() {
+	m := gol.NewEmergency("field", "value")
+
+	assert.Equal(s.T(), s.manager.Send(m), fmt.Errorf("manager.simple.LogManager is not running"))
 }

@@ -18,6 +18,7 @@ package simple
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/mediaFORGE/gol"
 )
@@ -31,12 +32,18 @@ type entry struct {
 // Manager generic struct for a logger manager.
 type Manager struct {
 	loggers map[string]entry
+	channel chan *gol.LogMessage
+	status  bool
 }
 
+// mutex lock to guarantee only one Run() goroutine is running per LogManager instance.
+var mutex = &sync.Mutex{}
+
 // New creates a simple implementation of a logger manager.
-func New() gol.LoggerManager {
+func New(cap int) gol.LoggerManager {
 	return &Manager{
 		loggers: make(map[string]entry),
+		channel: make(chan *gol.LogMessage, cap),
 	}
 }
 
@@ -113,19 +120,35 @@ func (m *Manager) Register(n string, l gol.Logger) error {
 	return nil
 }
 
-// Run keep reading from the input LogMessage channel and send messages to each logger.
-func (m *Manager) Run(c <-chan *gol.LogMessage) {
-	go func() {
-		for msg := range c {
-			if m != nil {
-				for _, l := range m.loggers {
-					if l.status {
-						l.logger.Send(msg)
+// Run start a goroutine that will distribute all messages in
+// the LogManager channel to each registered and enabled logger.
+func (m *Manager) Run() {
+	mutex.Lock()
+	if !m.status {
+		m.status = true
+		mutex.Unlock()
+
+		go func() {
+			for msg := range m.channel {
+				if m != nil {
+					for _, l := range m.loggers {
+						if l.status {
+							l.logger.Send(msg)
+						}
 					}
 				}
 			}
-		}
-	}()
+		}()
+	}
+}
+
+// Send process log message.
+func (m *Manager) Send(msg *gol.LogMessage) (err error) {
+	if !m.status {
+		return fmt.Errorf("manager.simple.LogManager is not running")
+	}
+	m.channel <- msg
+	return nil
 }
 
 var _ gol.LoggerManager = (*Manager)(nil)

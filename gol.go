@@ -48,12 +48,10 @@ type LoggerManager interface {
 	Enable(n string) error
 	IsEnabled(n string) (bool, error)
 	List() []string
-	Run(<-chan *LogMessage)
 	Register(n string, l Logger) error
+	Run()
+	Send(*LogMessage) (err error)
 }
 
 // Manager is the instance responsible for handling log messages and sending them to all registered loggers.
 var Manager LoggerManager
-
-// LogChannel the channel to pass log messages from the application to the logger manager.
-var LogChannel = make(chan *LogMessage, 1024)
