@@ -6,7 +6,11 @@ import (
 	"strings"
 
 	"github.com/mediaFORGE/gol"
+	"github.com/mediaFORGE/gol/fields"
+	field_severity "github.com/mediaFORGE/gol/fields/severity"
 	"github.com/mediaFORGE/gol/loggers/simple"
+
+	"github.com/fatih/color"
 )
 
 // Custom struct for a custom formatter.
@@ -19,11 +23,22 @@ func (f Custom) Format(msg *gol.LogMessage) (string, error) {
 
 	i := 0
 	for k, v := range *msg {
-		buffer[i] = fmt.Sprintf("%s:'%s'", k, v)
-		i += 1
+		if k != fields.Severity {
+			buffer[i] = fmt.Sprintf("%s:'%s'", k, v)
+			i += 1
+		}
 	}
 
-	return fmt.Sprintf("%s\n", strings.Join(buffer, " ")), nil
+	if severity, err := msg.Severity(); err != nil {
+		return fmt.Sprintf("UNKNOWN %s\n", strings.Join(buffer, " ")), nil
+	} else {
+		switch severity >= field_severity.Error {
+		case true:
+			return fmt.Sprintf("%s %s\n", color.RedString("%s", severity), strings.Join(buffer, " ")), nil
+		default:
+			return fmt.Sprintf("%s %s\n", severity, strings.Join(buffer, " ")), nil
+		}
+	}
 }
 
 var _ gol.LogFormatter = (*Custom)(nil)
