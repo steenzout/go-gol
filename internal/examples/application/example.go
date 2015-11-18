@@ -18,43 +18,20 @@ package main
 
 import (
 	"fmt"
-	"os"
-	//"time"
 
 	"github.com/mediaFORGE/gol"
-	"github.com/mediaFORGE/gol/formatters"
-
-	field_severity "github.com/mediaFORGE/gol/fields/severity"
-	filter_severity "github.com/mediaFORGE/gol/filters/severity"
-	logger_simple "github.com/mediaFORGE/gol/loggers/simple"
-	manager_simple "github.com/mediaFORGE/gol/manager/simple"
 )
 
-// LogMessageChannelCapacity the capacity of the log message channel.
-const LogMessageChannelCapacity = 1024
-
-// Log holds the application LogManager instance.
-var Log gol.LoggerManager
-
-func init() {
-	fmt.Println("init():start")
-	Log = manager_simple.New(LogMessageChannelCapacity)
-
-	f := filter_severity.New(field_severity.Info)
-	formatter := formatters.Text{}
-	logger := logger_simple.New(f, formatter, os.Stdout)
-	Log.Register("main", logger)
-
-	Log.Run()
-	Log.Send(gol.NewInfo("message", "main.Log has been configured"))
-	fmt.Println("init():end")
-}
-
 func main() {
-	fmt.Println("Started application...")
+	fmt.Println("Started application.")
+	defer func() {
+		Log.Close()
+		fmt.Println("Application ended.")
+	}()
+
+	// send 2,000 messages
 	for i := 0; i < 2000; i++ {
 		Log.Send(gol.NewInfo("i", fmt.Sprintf("%d", i)))
-		//time.Sleep(1 * time.Millisecond)
 	}
 	fmt.Println("Ending application...")
 }
