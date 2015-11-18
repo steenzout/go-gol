@@ -135,6 +135,7 @@ func (m *Manager) Run() {
 	mutex.Lock()
 	if !m.status {
 		m.status = true
+		m.waitGroup.Add(m.capacity)
 
 		for i := 0; i < m.capacity; i++ {
 			go m.process()
@@ -153,7 +154,6 @@ func (m *Manager) Send(msg *gol.LogMessage) (err error) {
 }
 
 func (m *Manager) process() {
-	m.waitGroup.Add(1)
 	for msg := range m.channel {
 		m.sendMessageToLoggers(msg)
 	}
