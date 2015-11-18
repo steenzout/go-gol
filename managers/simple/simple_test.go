@@ -24,7 +24,7 @@ import (
 	mfmock "github.com/mediaFORGE/gol/internal/mock"
 	logger_mock "github.com/mediaFORGE/gol/loggers/mock"
 	logger_simple "github.com/mediaFORGE/gol/loggers/simple"
-	"github.com/mediaFORGE/gol/manager/simple"
+	manager_simple "github.com/mediaFORGE/gol/managers/simple"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -54,7 +54,7 @@ func (s *ManagerTestSuite) testIsEnabled(n string, b bool, e error) {
 }
 
 func (s *ManagerTestSuite) SetupTest() {
-	s.manager = simple.New(Capacity)
+	s.manager = manager_simple.New(Capacity)
 }
 
 func (s *ManagerTestSuite) TeardownTest() {
