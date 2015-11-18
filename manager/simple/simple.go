@@ -31,9 +31,10 @@ type entry struct {
 
 // Manager generic struct for a logger manager.
 type Manager struct {
-	loggers map[string]entry
-	channel chan *gol.LogMessage
-	status  bool
+	loggers   map[string]entry
+	channel   chan *gol.LogMessage
+	waitGroup sync.WaitGroup
+	status    bool
 }
 
 // mutex lock to guarantee only one Run() goroutine is running per LogManager instance.
@@ -45,6 +46,15 @@ func New(cap int) gol.LoggerManager {
 		loggers: make(map[string]entry),
 		channel: make(chan *gol.LogMessage, cap),
 	}
+}
+
+// Close closes the log message channel and waits for all processing to complete.
+func (m *Manager) Close() {
+	mutex.Lock()
+	close(m.channel)
+	m.waitGroup.Wait()
+	m.status = false
+	mutex.Unlock()
 }
 
 // Deregister removes the logger with the given name from the manager.
@@ -126,20 +136,20 @@ func (m *Manager) Run() {
 	mutex.Lock()
 	if !m.status {
 		m.status = true
-		mutex.Unlock()
+		m.waitGroup.Add(1)
 
 		go func() {
 			for msg := range m.channel {
-				if m != nil {
-					for _, l := range m.loggers {
-						if l.status {
-							l.logger.Send(msg)
-						}
+				for _, l := range m.loggers {
+					if l.status {
+						l.logger.Send(msg)
 					}
 				}
 			}
+			m.waitGroup.Done()
 		}()
 	}
+	mutex.Unlock()
 }
 
 // Send process log message.
