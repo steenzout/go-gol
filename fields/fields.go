@@ -27,4 +27,6 @@ const (
 	Start = "start"
 	// StopLevel is the name of the log message attribute that stores a stop point in time.
 	Stop = "stop"
+	// Timestamp is the name of the log message attribute that the timestamp when the message was created.
+	Timestamp = "timestamp"
 )

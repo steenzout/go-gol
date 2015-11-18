@@ -135,3 +135,17 @@ func (s *MessageTestSuite) TestNewSeverity() {
 		s.assertSeverityLevel(severity.Type(lvl), f)
 	}
 }
+
+func (s *MessageTestSuite) TestTimestamp() {
+	var msg *gol.LogMessage
+
+	msg = &gol.LogMessage{"key": "value"}
+	v, err := msg.Timestamp()
+	assert.Equal(s.T(), fmt.Errorf("Message does not contain field timestamp"), err)
+	assert.Nil(s.T(), v)
+
+	msg = gol.NewInfo("key", "value")
+	v, err = msg.Timestamp()
+	assert.Nil(s.T(), err)
+	assert.True(s.T(), v.Before(time.Now()))
+}
