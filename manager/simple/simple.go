@@ -155,13 +155,17 @@ func (m *Manager) Send(msg *gol.LogMessage) (err error) {
 func (m *Manager) process() {
 	m.waitGroup.Add(1)
 	for msg := range m.channel {
-		for _, l := range m.loggers {
-			if l.status {
-				l.logger.Send(msg)
-			}
-		}
+		m.sendMessageToLoggers(msg)
 	}
 	m.waitGroup.Done()
+}
+
+func (m *Manager) sendMessageToLoggers(msg *gol.LogMessage) {
+	for _, l := range m.loggers {
+		if l.status {
+			l.logger.Send(msg)
+		}
+	}
 }
 
 var _ gol.LoggerManager = (*Manager)(nil)
