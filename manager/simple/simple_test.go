@@ -18,7 +18,6 @@ package simple_test
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/mediaFORGE/gol"
 	mfmock "github.com/mediaFORGE/gol/internal/mock"
@@ -55,6 +54,10 @@ func (s *ManagerTestSuite) testIsEnabled(n string, b bool, e error) {
 
 func (s *ManagerTestSuite) SetupTest() {
 	s.manager = simple.New(Capacity)
+}
+
+func (s *ManagerTestSuite) TeardownTest() {
+	s.manager.Close()
 }
 
 func (s *ManagerTestSuite) TestDeregister() {
@@ -163,7 +166,7 @@ func (s *ManagerTestSuite) TestSend() {
 
 	s.manager.Run()
 	assert.Nil(s.T(), s.manager.Send(m))
-	time.Sleep(1 * time.Second)
+	s.manager.Close()
 
 	mf1.AssertExpectations(s.T())
 	mfmt1.AssertExpectations(s.T())
