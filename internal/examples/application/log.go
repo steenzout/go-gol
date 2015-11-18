@@ -26,18 +26,18 @@ import (
 	field_severity "github.com/mediaFORGE/gol/fields/severity"
 	filter_severity "github.com/mediaFORGE/gol/filters/severity"
 	logger_simple "github.com/mediaFORGE/gol/loggers/simple"
-	manager_simple "github.com/mediaFORGE/gol/manager/simple"
+	manager_simple "github.com/mediaFORGE/gol/managers/simple"
 )
 
-// LogMessageChannelCapacity the capacity of the log message channel.
-const LogMessageChannelCapacity = 1024
+// LogWorkers the number of log message workers.
+const LogWorkers = 4
 
 // Log holds the application LogManager instance.
 var Log gol.LoggerManager
 
 func init() {
 	fmt.Println("init():start")
-	Log = manager_simple.New(LogMessageChannelCapacity)
+	Log = manager_simple.New(LogWorkers)
 
 	f := filter_severity.New(field_severity.Info)
 	formatter := formatters.Text{}
