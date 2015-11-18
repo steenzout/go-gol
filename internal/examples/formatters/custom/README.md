@@ -6,8 +6,14 @@ This example demonstrates a case where
 you have a logger that writes to `stdout` using a custom message formatter.
 
 ```
+# install dependencies
+$ go get github.com/fatih/color
+
+# build
 $ go buid example.go
-$ go run example.go
+
+# run
+$ ./custom
 severity:EMERGENCY message:system is down
 severity:ALERT message:failed to write to disk
 severity:CRITICAL message:high server load
