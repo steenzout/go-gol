@@ -21,8 +21,8 @@ import (
 
 	"github.com/mediaFORGE/gol"
 	"github.com/mediaFORGE/gol/internal/mock"
-
 	"github.com/mediaFORGE/gol/loggers/simple"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
