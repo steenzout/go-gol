@@ -1,6 +1,7 @@
 language: go
 cache:
   directories:
+    - ${GOPATH}/src/github.com/fatih
     - ${GOPATH}/src/github.com/golang
     - ${GOPATH}/src/github.com/h12w
     - ${GOPATH}/src/github.com/mattn
@@ -12,6 +13,7 @@ go:
 go_import_path: github.com/mediaFORGE/gol
 
 install:
+  - go get github.com/fatih/color
   - go get github.com/golang/lint/golint
   - go get github.com/h12w/gosweep
   - go get github.com/mattn/goveralls
