@@ -18,6 +18,7 @@ package simple_test
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/mediaFORGE/gol"
 	mfmock "github.com/mediaFORGE/gol/internal/mock"
@@ -32,7 +33,7 @@ import (
 
 const (
 	// Capacity the number of messages the log message channel can hold.
-	Capacity = 10
+	Capacity = 1
 )
 
 type ManagerTestSuite struct {
@@ -166,6 +167,7 @@ func (s *ManagerTestSuite) TestSend() {
 
 	s.manager.Run()
 	assert.Nil(s.T(), s.manager.Send(m))
+	time.Sleep(1 * time.Second)
 	s.manager.Close()
 
 	mf1.AssertExpectations(s.T())
