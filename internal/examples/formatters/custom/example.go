@@ -23,20 +23,22 @@ func (f Custom) Format(msg *gol.LogMessage) (string, error) {
 
 	i := 0
 	for k, v := range *msg {
-		if k != fields.Severity {
+		if k != fields.Severity && k != fields.Timestamp {
 			buffer[i] = fmt.Sprintf("%s:'%s'", k, v)
 			i += 1
 		}
 	}
 
+	t, _ := msg.Timestamp()
+
 	if severity, err := msg.Severity(); err != nil {
-		return fmt.Sprintf("UNKNOWN %s\n", strings.Join(buffer, " ")), nil
+		return fmt.Sprintf("%s UNKNOWN %s\n", t.String(), strings.Join(buffer, " ")), nil
 	} else {
 		switch severity >= field_severity.Error {
 		case true:
-			return fmt.Sprintf("%s %s\n", color.RedString("%s", severity), strings.Join(buffer, " ")), nil
+			return fmt.Sprintf("%s %s %s\n", t.String(), color.RedString("%s", severity), strings.Join(buffer, " ")), nil
 		default:
-			return fmt.Sprintf("%s %s\n", severity, strings.Join(buffer, " ")), nil
+			return fmt.Sprintf("%s %s %s\n", t.String(), severity, strings.Join(buffer, " ")), nil
 		}
 	}
 }
