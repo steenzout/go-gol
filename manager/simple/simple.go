@@ -31,6 +31,7 @@ type entry struct {
 
 // Manager generic struct for a logger manager.
 type Manager struct {
+	capacity  int
 	loggers   map[string]entry
 	channel   chan *gol.LogMessage
 	waitGroup sync.WaitGroup
@@ -43,18 +44,16 @@ var mutex = &sync.Mutex{}
 // New creates a simple implementation of a logger manager.
 func New(cap int) gol.LoggerManager {
 	return &Manager{
-		loggers: make(map[string]entry),
-		channel: make(chan *gol.LogMessage, cap),
+		capacity: cap,
+		loggers:  make(map[string]entry),
+		channel:  make(chan *gol.LogMessage, cap),
 	}
 }
 
 // Close closes the log message channel and waits for all processing to complete.
 func (m *Manager) Close() {
-	mutex.Lock()
 	close(m.channel)
 	m.waitGroup.Wait()
-	m.status = false
-	mutex.Unlock()
 }
 
 // Deregister removes the logger with the given name from the manager.
@@ -136,18 +135,10 @@ func (m *Manager) Run() {
 	mutex.Lock()
 	if !m.status {
 		m.status = true
-		m.waitGroup.Add(1)
 
-		go func() {
-			for msg := range m.channel {
-				for _, l := range m.loggers {
-					if l.status {
-						l.logger.Send(msg)
-					}
-				}
-			}
-			m.waitGroup.Done()
-		}()
+		for i := 0; i < m.capacity; i++ {
+			go m.process()
+		}
 	}
 	mutex.Unlock()
 }
@@ -159,6 +150,18 @@ func (m *Manager) Send(msg *gol.LogMessage) (err error) {
 	}
 	m.channel <- msg
 	return nil
+}
+
+func (m *Manager) process() {
+	m.waitGroup.Add(1)
+	for msg := range m.channel {
+		for _, l := range m.loggers {
+			if l.status {
+				l.logger.Send(msg)
+			}
+		}
+	}
+	m.waitGroup.Done()
 }
 
 var _ gol.LoggerManager = (*Manager)(nil)
