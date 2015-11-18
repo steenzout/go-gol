@@ -26,11 +26,11 @@ func main() {
 	fmt.Println("Started application.")
 	defer func() {
 		Log.Close()
-		fmt.Println("Application ended.")
+		fmt.Println("Ended application.")
 	}()
 
 	// send 2,000 messages
-	for i := 0; i < 2000; i++ {
+	for i := 0; i < 100000; i++ {
 		Log.Send(gol.NewInfo("i", fmt.Sprintf("%d", i)))
 	}
 	fmt.Println("Ending application...")
