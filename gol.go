@@ -43,6 +43,7 @@ type Logger interface {
 
 // LoggerManager the interface to manage an application set of loggers.
 type LoggerManager interface {
+	Close()
 	Deregister(n string) error
 	Disable(n string) error
 	Enable(n string) error
