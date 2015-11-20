@@ -29,7 +29,7 @@ func main() {
 		fmt.Println("Ended application.")
 	}()
 
-	// send 2,000 messages
+	// send 10,000 messages
 	for i := 0; i < 100000; i++ {
 		Log.Send(gol.NewInfo("i", fmt.Sprintf("%d", i)))
 	}
