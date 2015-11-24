@@ -30,23 +30,23 @@ import (
 	manager_simple "github.com/mediaFORGE/gol/managers/simple"
 )
 
-// LogWorkers the number of log message workers.
-const LogWorkers = 4
-
 // Log holds the application LogManager instance.
 var Log gol.LoggerManager
 
 func init() {
 	fmt.Println("init():start")
-	Log = manager_simple.New(LogWorkers)
+	Log = manager_simple.New()
 
 	f := filter_severity.New(field_severity.Info)
 	formatter := formatters.Text{}
 	logger := logger_simple.New(f, formatter, os.Stdout)
 	Log.Register("main", logger)
 
-	Log.Run()
+	channel := make(chan *gol.LogMessage, 10)
+	Log.Run(channel)
 	Log.Send(gol.NewInfo("message", "main.Log has been configured"))
+	channel <- gol.NewInfo("message", "this message was sent directly to the log manager channel")
+
 	fmt.Println("init():end")
 }
 
