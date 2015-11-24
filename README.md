@@ -58,7 +58,7 @@ func main() {
 	}()
 
 	// send 10,000 messages
-	for i := 0; i < 100000; i++ {
+	for i := 0; i < 10000; i++ {
 		Log.Send(gol.NewInfo("i", fmt.Sprintf("%d", i)))
 	}
 	fmt.Println("Ending application...")
