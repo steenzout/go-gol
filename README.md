@@ -6,7 +6,7 @@
 [![Project Stats](https://www.openhub.net/p/mediaFORGE-gol/widgets/project_thin_badge.gif)](https://www.openhub.net/p/mediaFORGE-gol/)
 [![Coverage Status](https://coveralls.io/repos/steenzout/gol/badge.svg?branch=develop&service=github)](https://coveralls.io/github/steenzout/gol?branch=develop)
 
-gol is an easily extensible concurrent logging library.
+gol is an easily extensible asynchronous logging library.
 
 If you would like to contribute
 check [CONTRIBUTING.md](https://github.com/mediaFORGE/gol/tree/master/CONTRIBUTING.md).
