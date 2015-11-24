@@ -32,13 +32,16 @@ type LogFormatter interface {
 
 // Logger the interface a log message consumer must implement.
 type Logger interface {
+	Close()
 	Filter() LogFilter
 	Formatter() LogFormatter
-	Writer() io.Writer
+	Run(chan *LogMessage)
 	Send(*LogMessage) error
 	SetFilter(LogFilter) error
 	SetFormatter(LogFormatter) error
 	SetWriter(io.Writer) error
+	Status() bool
+	Writer() io.Writer
 }
 
 // LoggerManager the interface to manage an application set of loggers.
@@ -50,7 +53,7 @@ type LoggerManager interface {
 	IsEnabled(n string) (bool, error)
 	List() []string
 	Register(n string, l Logger) error
-	Run()
+	Run(chan *LogMessage)
 	Send(*LogMessage) (err error)
 }
 

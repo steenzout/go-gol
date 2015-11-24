@@ -31,14 +31,10 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-const (
-	// Capacity the number of messages the log message channel can hold.
-	Capacity = 1
-)
-
 type ManagerTestSuite struct {
 	suite.Suite
 	manager gol.LoggerManager
+	channel chan *gol.LogMessage
 }
 
 func (s *ManagerTestSuite) testIsEnabled(n string, b bool, e error) {
@@ -54,11 +50,13 @@ func (s *ManagerTestSuite) testIsEnabled(n string, b bool, e error) {
 }
 
 func (s *ManagerTestSuite) SetupTest() {
-	s.manager = manager_simple.New(Capacity)
+	s.manager = manager_simple.New()
+	s.channel = make(chan *gol.LogMessage, 1)
 }
 
 func (s *ManagerTestSuite) TeardownTest() {
 	s.manager.Close()
+	close(s.channel)
 }
 
 func (s *ManagerTestSuite) TestDeregister() {
@@ -165,7 +163,8 @@ func (s *ManagerTestSuite) TestSend() {
 	s.manager.Register("l1", l1)
 	s.manager.Register("l2", l2)
 
-	s.manager.Run()
+	s.manager.Run(s.channel)
+
 	assert.Nil(s.T(), s.manager.Send(m))
 	time.Sleep(1 * time.Second)
 	s.manager.Close()
