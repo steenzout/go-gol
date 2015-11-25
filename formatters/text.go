@@ -19,8 +19,12 @@ package formatters
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/mediaFORGE/gol"
+	"github.com/mediaFORGE/gol/fields"
+	"github.com/mediaFORGE/gol/fields/severity"
+	"github.com/mediaFORGE/gol/fields/timestamp"
 )
 
 // Text struct for a generic text formatter.
@@ -33,11 +37,24 @@ func (f Text) Format(msg *gol.LogMessage) (string, error) {
 
 	i := 0
 	for k, v := range *msg {
-		buffer[i] = fmt.Sprintf("%s=%s", k, v)
-		i += 1
+		if k != fields.Severity && k != fields.Timestamp {
+			buffer[i] = fmt.Sprintf("%s='%s'", k, v)
+			i += 1
+		}
 	}
 
-	return fmt.Sprintf("%s\n", strings.Join(buffer, " ")), nil
+	var err error
+	var t *timestamp.Type
+	var s severity.Type
+	if t, err = msg.Timestamp(); err != nil {
+		t = &timestamp.Type{time.Now()}
+	}
+
+	if s, err = msg.Severity(); err != nil {
+		return fmt.Sprintf("%s UNKNOWN %s\n", t.String(), strings.Join(buffer, " ")), nil
+	} else {
+		return fmt.Sprintf("%s %s %s\n", t.String(), s.String(), strings.Join(buffer, " ")), nil
+	}
 }
 
 var _ gol.LogFormatter = (*Text)(nil)

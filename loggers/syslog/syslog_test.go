@@ -102,7 +102,8 @@ func (s *LoggerTestSuite) TestSend() {
 	// invalid severity will be sent with the default logger severity level
 	s.logger.Send(gol.NewMessage(severity.Debug+1, "invalid", "severity"))
 	readch <- true // read message sent
-	assert.True(s.T(), strings.Contains(<-msgch, "severity=UNKNOWN"))
+	m := <-msgch
+	assert.True(s.T(), strings.Contains(m, "UNKNOWN") && strings.Contains(m, "invalid='severity'"))
 	readch <- false // end concurrent go routine
 }
 
@@ -129,4 +130,9 @@ func (s *LoggerTestSuite) TestSendFormatterError() {
 	assert.Error(s.T(), s.logger.Send(msg))
 
 	m.AssertExpectations(s.T())
+}
+
+// TestLoggerSuite runs the LoggerTestSuite.
+func TestLoggerSuite(t *testing.T) {
+	suite.Run(t, new(LoggerTestSuite))
 }

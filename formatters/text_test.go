@@ -17,6 +17,9 @@
 package formatters_test
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/mediaFORGE/gol"
 
 	"github.com/mediaFORGE/gol/formatters"
@@ -33,9 +36,10 @@ func (s *TextTestSuite) TestFormat() {
 		"key1": "value1",
 		"key2": "value2",
 	}
-	fmt := &formatters.Text{}
+	f := &formatters.Text{}
 
-	o, err := fmt.Format(msg)
-	assert.True(s.T(), "key1=value1 key2=value2\n" == o || "key2=value2 key1=value1\n" == o)
+	o, err := f.Format(msg)
+	fmt.Println(o)
+	assert.True(s.T(), strings.Contains(o, "key1='value1'") && strings.Contains(o, "key2='value2'"))
 	assert.Nil(s.T(), err)
 }
