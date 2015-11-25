@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 
-package main
+package severity_test
 
 import (
 	"os"
@@ -26,19 +26,31 @@ import (
 	"github.com/mediaFORGE/gol/loggers/simple"
 )
 
-var txtFmt = &formatters.Text{}
-var errorLog gol.Logger = simple.New(filter.New(field.Error), txtFmt, os.Stderr)
+func ExampleSeverity() {
+	txtFmt := &formatters.Text{}
+	errorLog := simple.New(filter.New(field.Error), txtFmt, os.Stderr)
 
-func main() {
-	// this will be written to stderr
 	errorLog.Send(gol.NewEmergency("message", "system is down"))
-	errorLog.Send(gol.NewAlert("message", "failed to write to disk"))
-	errorLog.Send(gol.NewCritical("message", "high server load"))
-	errorLog.Send(gol.NewError("message", "invalid number format"))
+	// Output: EMERGENCY message:'system is down'
 
-	// this will not be written anywhere
+	errorLog.Send(gol.NewAlert("message", "failed to write to disk"))
+	// Output: ALERT message:'failed to write to disk'
+
+	errorLog.Send(gol.NewCritical("message", "high server load"))
+	// Output: CRITICAL message:'high server load'
+
+	errorLog.Send(gol.NewError("message", "invalid number format"))
+	// Output: ERROR message:'invalid number format'
+
 	errorLog.Send(gol.NewWarning("message", "performance close to 1s threshold"))
+	// Output:
+
 	errorLog.Send(gol.NewNotice("message", "failed to communicate with monitoring service"))
+	// Output:
+
 	errorLog.Send(gol.NewInfo("message", "requested processed in 250ms"))
+	// Output:
+
 	errorLog.Send(gol.NewDebug("debug", "var x = 10"))
+	// Output:
 }

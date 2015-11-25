@@ -17,6 +17,8 @@
 package severity_test
 
 import (
+	"testing"
+
 	"github.com/mediaFORGE/gol"
 	field "github.com/mediaFORGE/gol/fields/severity"
 	filter "github.com/mediaFORGE/gol/filters/severity"
@@ -54,4 +56,8 @@ func (s *FilterTestSuite) TestFilter() {
 func (s *FilterTestSuite) TestFilterNoSeverityField() {
 	f := filter.New(field.Type(field.Debug))
 	assert.True(s.T(), f.Filter(&gol.LogMessage{}))
+}
+
+func TestFilter(t *testing.T) {
+	suite.Run(t, new(FilterTestSuite))
 }
