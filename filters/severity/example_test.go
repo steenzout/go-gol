@@ -31,16 +31,16 @@ func ExampleSeverity() {
 	errorLog := simple.New(filter.New(field.Error), txtFmt, os.Stderr)
 
 	errorLog.Send(gol.NewEmergency("message", "system is down"))
-	// Output: EMERGENCY message:'system is down'
+	// Output: EMERGENCY message='system is down'
 
 	errorLog.Send(gol.NewAlert("message", "failed to write to disk"))
-	// Output: ALERT message:'failed to write to disk'
+	// Output: ALERT message='failed to write to disk'
 
 	errorLog.Send(gol.NewCritical("message", "high server load"))
-	// Output: CRITICAL message:'high server load'
+	// Output: CRITICAL message='high server load'
 
 	errorLog.Send(gol.NewError("message", "invalid number format"))
-	// Output: ERROR message:'invalid number format'
+	// Output: ERROR message='invalid number format'
 
 	errorLog.Send(gol.NewWarning("message", "performance close to 1s threshold"))
 	// Output:
