@@ -1,10 +1,11 @@
 ![Logo](https://raw.githubusercontent.com/mediaFORGE/gol/develop/logo.png)
 
 [![License](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat)](https://raw.githubusercontent.com/mediaFORGE/gol/master/LICENSE)
+[![GoDoc](http://img.shields.io/badge/go-documentation-blue.svg?style=flat)](http://godoc.org/github.com/mediaFORGE/gol)
 [![Build Status](https://travis-ci.org/mediaFORGE/gol.svg?branch=develop)](https://travis-ci.org/mediaFORGE/gol)
+[![Coverage Status](https://coveralls.io/repos/steenzout/gol/badge.svg?branch=develop&service=github)](https://coveralls.io/github/steenzout/gol?branch=develop)
 
 [![Project Stats](https://www.openhub.net/p/mediaFORGE-gol/widgets/project_thin_badge.gif)](https://www.openhub.net/p/mediaFORGE-gol/)
-[![Coverage Status](https://coveralls.io/repos/steenzout/gol/badge.svg?branch=develop&service=github)](https://coveralls.io/github/steenzout/gol?branch=develop)
 
 gol is an easily extensible asynchronous logging library.
 
