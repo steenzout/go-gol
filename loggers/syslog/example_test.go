@@ -14,10 +14,12 @@
 // limitations under the License.
 //
 
-package main
+package syslog_test
 
 import (
 	"log/syslog"
+	"net"
+	"os"
 
 	"github.com/mediaFORGE/gol"
 	"github.com/mediaFORGE/gol/formatters"
@@ -27,10 +29,42 @@ import (
 var log gol.Logger
 
 func init() {
-	log = mfsyslog.New("udp", "127.0.0.1:32376", syslog.LOG_EMERG, "example.go", &formatters.Text{})
+	log = mfsyslog.New("udp", "127.0.0.1:10001", syslog.LOG_EMERG, "example.go", &formatters.Text{})
+
+	syncch := make(chan bool, 1)
+	readch := make(chan bool, 1)
+	go ListenToUDP(syncch, readch)
+	<-syncch
 }
 
-func main() {
+func ListenToUDP(ch chan bool, readch chan bool) {
+	if addr, err := net.ResolveUDPAddr("udp", ":10001"); err != nil {
+		os.Stderr.WriteString("error ", err)
+	} else {
+		/* Now listen at selected port */
+		if conn, err := net.ListenUDP("udp", addr); err != nil {
+			os.Stderr.WriteString("error ", err)
+		} else {
+			defer conn.Close()
+
+			buf := make([]byte, 1024)
+
+			ch <- true
+
+			for {
+				if !<-readch {
+					break // end loop execution and end go routine
+				}
+				msgchan <- m.read(conn, buf)
+			}
+		}
+	}
+}
+
+func Example() {
 	log.Send(gol.NewInfo("message", "example execution started"))
+	// Output: message='example execution started'
+
 	log.Send(gol.NewInfo("message", "example execution ended"))
+	// Output: message='example execution ended'
 }
