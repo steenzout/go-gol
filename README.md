@@ -3,6 +3,7 @@
 [![License](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat)](https://raw.githubusercontent.com/mediaFORGE/gol/master/LICENSE)
 [![Build Status](https://travis-ci.org/mediaFORGE/gol.svg?branch=develop)](https://travis-ci.org/mediaFORGE/gol)
 
+[![Project Stats](https://www.openhub.net/p/mediaFORGE-gol/widgets/project_thin_badge.gif)](https://www.openhub.net/p/mediaFORGE-gol/)
 [![Coverage Status](https://coveralls.io/repos/steenzout/gol/badge.svg?branch=develop&service=github)](https://coveralls.io/github/steenzout/gol?branch=develop)
 
 gol is an easily extensible concurrent logging library.
@@ -29,23 +30,23 @@ import (
 	manager_simple "github.com/mediaFORGE/gol/managers/simple"
 )
 
-// LogWorkers the number of log message workers.
-const LogWorkers = 4
-
 // Log holds the application LogManager instance.
 var Log gol.LoggerManager
 
 func init() {
 	fmt.Println("init():start")
-	Log = manager_simple.New(LogWorkers)
+	Log = manager_simple.New()
 
 	f := filter_severity.New(field_severity.Info)
 	formatter := formatters.Text{}
 	logger := logger_simple.New(f, formatter, os.Stdout)
 	Log.Register("main", logger)
 
-	Log.Run()
+	channel := make(chan *gol.LogMessage, 10)
+	Log.Run(channel)
 	Log.Send(gol.NewInfo("message", "main.Log has been configured"))
+	channel <- gol.NewInfo("message", "this message was sent directly to the log manager channel")
+
 	fmt.Println("init():end")
 }
 
@@ -57,7 +58,7 @@ func main() {
 	}()
 
 	// send 10,000 messages
-	for i := 0; i < 100000; i++ {
+	for i := 0; i < 10000; i++ {
 		Log.Send(gol.NewInfo("i", fmt.Sprintf("%d", i)))
 	}
 	fmt.Println("Ending application...")

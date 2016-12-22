@@ -19,12 +19,17 @@ package simple
 import (
 	"fmt"
 	"io"
+	"sync"
 
 	"github.com/mediaFORGE/gol"
 )
 
 // Logger generic struct for a logger.
 type Logger struct {
+	channel   chan *gol.LogMessage
+	mutex     sync.Mutex
+	waitGroup sync.WaitGroup
+	status    bool
 	filter    gol.LogFilter
 	formatter gol.LogFormatter
 	writer    io.Writer
@@ -32,7 +37,33 @@ type Logger struct {
 
 // New creates and initializes a generic logger struct.
 func New(f gol.LogFilter, fmt gol.LogFormatter, w io.Writer) *Logger {
-	return &Logger{f, fmt, w}
+	return &Logger{
+		mutex:     sync.Mutex{},
+		waitGroup: sync.WaitGroup{},
+		status:    false,
+		filter:    f,
+		formatter: fmt,
+		writer:    w,
+	}
+}
+
+// Close closes the log message channel and waits for all processing to complete.
+func (l *Logger) Close() {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+
+	if l.status {
+		l.waitGroup.Wait()
+		l.status = false
+	}
+}
+
+// process processes messages from logger channel.
+func (l *Logger) process() {
+	for msg := range l.channel {
+		l.Send(msg)
+	}
+	l.waitGroup.Done()
 }
 
 // Filter returns the logger filter.
@@ -45,9 +76,18 @@ func (l *Logger) Formatter() gol.LogFormatter {
 	return l.formatter
 }
 
-// Writer returns the logger writer.
-func (l *Logger) Writer() io.Writer {
-	return l.writer
+// Run runs a go routine to process messages from the logger channel.
+func (l *Logger) Run(c chan *gol.LogMessage) {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+
+	if !l.status {
+		l.waitGroup.Add(1)
+		l.channel = c
+
+		go l.process()
+		l.status = true
+	}
 }
 
 // Send process log message.
@@ -99,6 +139,20 @@ func (l *Logger) SetWriter(w io.Writer) error {
 	}
 	l.writer = w
 	return nil
+}
+
+// Status returns the logger running status.
+// True means the logger go routine is running; False otherwise.
+func (l *Logger) Status() bool {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+
+	return l.status
+}
+
+// Writer returns the logger writer.
+func (l *Logger) Writer() io.Writer {
+	return l.writer
 }
 
 var _ gol.Logger = (*Logger)(nil)

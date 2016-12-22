@@ -25,8 +25,9 @@ import (
 
 // entry the internal structure that links a logger to a status.
 type entry struct {
-	logger gol.Logger
-	status bool
+	channel chan *gol.LogMessage
+	logger  gol.Logger
+	status  bool
 }
 
 // Manager generic struct for a logger manager.
@@ -34,31 +35,42 @@ type Manager struct {
 	capacity  int
 	loggers   map[string]entry
 	channel   chan *gol.LogMessage
+	mutex     sync.Mutex
 	waitGroup sync.WaitGroup
 	status    bool
 }
 
-// mutex lock to guarantee only one Run() goroutine is running per LogManager instance.
-var mutex = &sync.Mutex{}
-
 // New creates a simple implementation of a logger manager.
-func New(cap int) gol.LoggerManager {
+func New() gol.LoggerManager {
 	return &Manager{
-		capacity: cap,
-		loggers:  make(map[string]entry),
-		channel:  make(chan *gol.LogMessage, cap),
+		loggers: make(map[string]entry),
+		mutex:   sync.Mutex{},
 	}
 }
 
 // Close closes the log message channel and waits for all processing to complete.
 func (m *Manager) Close() {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+
 	close(m.channel)
 	m.waitGroup.Wait()
+
+	for _, e := range m.loggers {
+		e.status = false
+		close(e.channel)
+		e.logger.Close()
+	}
+	m.status = false
 }
 
 // Deregister removes the logger with the given name from the manager.
 func (m *Manager) Deregister(n string) (err error) {
 	if _, ok := m.loggers[n]; ok {
+		e := m.loggers[n]
+		e.status = false
+		close(e.channel)
+
 		delete(m.loggers, n)
 	} else {
 		err = fmt.Errorf("No logger registered as %s", n)
@@ -122,26 +134,29 @@ func (m *Manager) Register(n string, l gol.Logger) error {
 	if l == nil {
 		return fmt.Errorf("Cannot register a nil logger")
 	}
+	lchan := make(chan *gol.LogMessage, 1)
+	l.Run(lchan)
 	m.loggers[n] = entry{
-		logger: l,
-		status: true,
+		channel: lchan,
+		logger:  l,
+		status:  true,
 	}
 	return nil
 }
 
 // Run start a goroutine that will distribute all messages in
 // the LogManager channel to each registered and enabled logger.
-func (m *Manager) Run() {
-	mutex.Lock()
+func (m *Manager) Run(c chan *gol.LogMessage) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+
 	if !m.status {
 		m.status = true
-		m.waitGroup.Add(m.capacity)
+		m.waitGroup.Add(1)
+		m.channel = c
 
-		for i := 0; i < m.capacity; i++ {
-			go m.process()
-		}
+		go m.process()
 	}
-	mutex.Unlock()
 }
 
 // Send process log message.
@@ -161,9 +176,9 @@ func (m *Manager) process() {
 }
 
 func (m *Manager) sendMessageToLoggers(msg *gol.LogMessage) {
-	for _, l := range m.loggers {
-		if l.status {
-			l.logger.Send(msg)
+	for _, e := range m.loggers {
+		if e.status {
+			e.channel <- msg
 		}
 	}
 }
