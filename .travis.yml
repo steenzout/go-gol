@@ -14,7 +14,7 @@ go_import_path: github.com/mediaFORGE/gol
 
 install:
   - go get github.com/fatih/color
-  - go get github.com/golang/lint/golint
+  - go get golang.org/x/lint/golint
   - go get github.com/h12w/gosweep
   - go get github.com/mattn/goveralls
   - go get github.com/stretchr/testify
